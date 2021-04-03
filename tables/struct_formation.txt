@@ -1,0 +1,2 @@
+monster_indexes,8,list
+appearance_rate,1

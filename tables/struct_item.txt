@@ -1,0 +1,4 @@
+item_name,12,str
+misc,bit:target_both target_selectable target_enemy_default target_all story_item show_name show_animation usable_menu
+unknown,3,list
+price,2

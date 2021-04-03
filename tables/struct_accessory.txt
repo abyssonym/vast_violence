@@ -1,0 +1,6 @@
+item_name,12,str
+equipability,bit:ryu nina garr teepo rei momo peco unk
+unknown1,2,list
+weight,1
+unknown2,2,list
+price,2

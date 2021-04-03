@@ -1,0 +1,13 @@
+ItemObject          struct_item.txt             33964@BIN/ETC/GAME.EMI      92
+KeyItemObject       struct_key_item.txt         33fdc@BIN/ETC/GAME.EMI      16
+WeaponObject        struct_weapon.txt           340dc@BIN/ETC/GAME.EMI      83
+ArmorObject         struct_armor.txt            348a4@BIN/ETC/GAME.EMI      68
+AccessoryObject     struct_accessory.txt        34e7c@BIN/ETC/GAME.EMI      52
+AbilityObject       struct_ability.txt          3570c@BIN/ETC/GAME.EMI      228
+LevelObject         struct_level.txt            368dc@BIN/ETC/GAME.EMI      693
+ShopObject          struct_shop.txt             3528c@BIN/ETC/GAME.EMI      40
+MasterSkillObject   struct_master_skill.txt     03c88@BIN/ETC/SISYOU.EMI    17
+MasterStatsObject   struct_master_stats.txt     03d54@BIN/ETC/SISYOU.EMI    17
+BaseStatsObject     struct_base_stats.txt       72914@BIN/ETC/START.EMI     8
+FormationObject     struct_formation.txt        pointers_formations.txt
+MonsterObject       struct_monster.txt          pointers_monsters.txt

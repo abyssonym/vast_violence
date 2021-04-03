@@ -1,0 +1,6 @@
+hp,1
+mp,1
+str,1
+def,1
+agi,1
+int,1

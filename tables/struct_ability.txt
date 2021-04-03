@@ -1,0 +1,8 @@
+ability_name,12,str
+misc,bit:u0 u1 u2 u3 u4 u5 u6 u7
+unknown1,1
+cost,1
+power,1
+element,bit:fire ice lightning earth wind holy psionic status
+unknown2,1
+unknown3,2

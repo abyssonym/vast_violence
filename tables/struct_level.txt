@@ -1,0 +1,7 @@
+exp,2
+hp,1
+ap,1
+str_def,1
+agi_int,1
+ability,1
+unknown,1
