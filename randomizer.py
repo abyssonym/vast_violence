@@ -1,5 +1,6 @@
 from randomtools.tablereader import (
-    TableObject, addresses, get_activated_patches, get_open_file)
+    TableObject, addresses, get_activated_patches, get_open_file,
+    mutate_normal)
 from randomtools.utils import (
     classproperty, cached_property, utilrandom as random)
 from randomtools.interface import (
@@ -70,6 +71,9 @@ class AcquireItemMixin(TableObject):
 
 
 class ItemMixin(NameMixin):
+    flag = 's'
+    mutate_attributes = {'price': (1, 65000)}
+
     @classproperty
     def ITEM_TYPE_MAP(self):
         return {
@@ -148,12 +152,20 @@ class ItemMixin(NameMixin):
 
         return self.rank
 
-    def get_similar(self, candidates=None, random_degree=None):
+    def get_similar(self, candidates=None, override_outsider=False,
+                    random_degree=None):
         if candidates is None:
             candidates = ItemMixin.ranked_shuffle_items
         new_item = super().get_similar(candidates=candidates,
+                                       override_outsider=override_outsider,
                                        random_degree=random_degree)
         return new_item
+
+    def cleanup(self):
+        if self.price >= 100:
+            self.price = int(float('%.2g' % (self.price*2)) / 2)
+        else:
+            self.price = int(float('%.1g' % (self.price*2)) / 2)
 
 
 class DupeMixin:
@@ -204,6 +216,17 @@ class ShopObject(TableObject):
         return s.strip()
 
     @property
+    def comparison(self):
+        if self.items == self.old_items:
+            return self.__repr__()
+
+        s = 'SHOP {0:0>2X} {1:0>2X}\n'.format(self.index, self.unknown)
+        for old_item, new_item in zip(self.old_items, self.items):
+            s += '  {0:12} {1:>5} -> {2:12} {3:>5}\n'.format(
+                old_item.name, old_item.price, new_item.name, new_item.price)
+        return s.strip()
+
+    @property
     def item_types(self):
         return [v & 0xff for v in self.item_type_item_indexes]
 
@@ -211,14 +234,94 @@ class ShopObject(TableObject):
     def item_indexes(self):
         return [v >> 8 for v in self.item_type_item_indexes]
 
-    @property
-    def items(self):
+    @classmethod
+    def items_from_indexes(self, item_types, item_indexes):
         items = []
-        for item_type, item_index in zip(self.item_types, self.item_indexes):
+        for item_type, item_index in zip(item_types, item_indexes):
             obj = ItemMixin.ITEM_TYPE_MAP[item_type]
             item = obj.get(item_index)
             items.append(item)
         return items
+
+    @property
+    def items(self):
+        return self.items_from_indexes(self.item_types, self.item_indexes)
+
+    @property
+    def old_items(self):
+        item_types = [v & 0xff for v in
+                      self.old_data['item_type_item_indexes']]
+        item_indexes = [v >> 8 for v in
+                        self.old_data['item_type_item_indexes']]
+        return self.items_from_indexes(item_types, item_indexes)
+
+    def item_type_from_item(self, item):
+        return ItemMixin.item_type_from_item(item)
+
+    def set_items(self, items):
+        self.item_type_item_indexes = [
+            (i.index << 8) | self.item_type_from_item(i) for i in items]
+        assert self.items == items
+
+    def mutate(self):
+        random_degree = self.random_degree ** 0.5
+        candidates = []
+
+        valid_items = [i for i in self.old_items if i.index > 0]
+        for s in ShopObject.every:
+            shop_items = [i for i in s.old_items if i.index > 0]
+            for i in valid_items:
+                if i in shop_items:
+                    candidates += shop_items
+        candidates = sorted(candidates, key=lambda i: i.rank)
+
+        duplicates_allowed = len(set(valid_items)) != len(valid_items)
+        new_items = []
+        for i in self.old_items:
+            if i.index == 0:
+                continue
+
+            if (not isinstance(i, ItemObject) and
+                    random.random() < random_degree):
+                my_candidates = [c for c in ItemMixin.ranked_shuffle_items
+                                 if type(c) == type(i)]
+            else:
+                my_candidates = list(candidates)
+
+            if not duplicates_allowed:
+                my_candidates = [c for c in my_candidates
+                                 if c is i or c not in new_items]
+            while my_candidates.count(i) > 1:
+                my_candidates.remove(i)
+
+            index = my_candidates.index(i)
+            if i in new_items:
+                my_candidates.remove(i)
+            if my_candidates:
+                max_index = len(my_candidates)-1
+                index = min(max(index, 0), max_index)
+                index = mutate_normal(index, 0, max_index,
+                                      random_degree=random_degree)
+                new_item = my_candidates[index]
+            else:
+                new_item = i
+            new_items.append(new_item)
+
+        self.set_items(new_items)
+
+    def cleanup(self):
+        sorted_items = sorted(
+            self.items, key=lambda i: (
+                self.item_type_from_item(i),
+                i.equip_type if isinstance(i, ArmorObject) else 0,
+                i.name))
+        sorted_items = [i for i in sorted_items if i.index > 0]
+        if not 0x11 <= self.index <= 0x16:  # faerie shops
+            self.set_items(sorted_items)
+
+        while len(self.items) < len(self.old_data['item_type_item_indexes']):
+            self.item_type_item_indexes.append(0)
+
 
 class MasterSkillObject(TableObject): pass
 class MasterStatsObject(TableObject): pass
