@@ -1,2 +1,2 @@
-item_name,13,str
-unknown,3,list
+item_name,12,str
+unknown,4,list

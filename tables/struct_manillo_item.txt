@@ -1,0 +1,4 @@
+item_index,1
+item_type,1
+fish_indexes,3,list
+fish_quantities,3,list

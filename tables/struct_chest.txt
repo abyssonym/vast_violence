@@ -1,0 +1,3 @@
+memory,1
+item_index,1
+item_type,1

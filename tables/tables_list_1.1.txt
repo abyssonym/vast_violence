@@ -9,5 +9,9 @@ ShopObject          struct_shop.txt             3528c@BIN/ETC/GAME.EMI      40
 MasterSkillObject   struct_master_skill.txt     03c88@BIN/ETC/SISYOU.EMI    17
 MasterStatsObject   struct_master_stats.txt     03d54@BIN/ETC/SISYOU.EMI    17
 BaseStatsObject     struct_base_stats.txt       72914@BIN/ETC/START.EMI     8
+ChestObject         struct_chest.txt            pointers_chests.txt
+GeneObject          struct_gene.txt             pointers_genes.txt
 FormationObject     struct_formation.txt        pointers_formations.txt
+ManilloItemObject   struct_manillo_item.txt     pointers_manillo_items.txt
 MonsterObject       struct_monster.txt          pointers_monsters.txt
+.patch              patch_flame_gene.txt
