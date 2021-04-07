@@ -261,6 +261,10 @@ class ChestObject(DupeMixin, AcquireItemMixin):
 
 
 class GeneObject(TableObject):
+    flag = 'g'
+    flag_description = 'dragon gene locations'
+    intershuffle_attributes = ['gene_index']
+
     def cleanup(self):
         if self.gene_index == 0x21:
             assert 'patch_flame_gene.txt' in get_activated_patches()
