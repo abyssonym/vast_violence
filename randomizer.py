@@ -6,6 +6,7 @@ from randomtools.interface import (
     run_interface, clean_and_write, finish_interface,
     get_activated_codes)
 from collections import Counter
+from math import ceil
 from sys import argv
 from traceback import format_exc
 
@@ -31,7 +32,44 @@ class NameMixin(TableObject):
         return name.decode('ascii').rstrip('\x00')
 
 
-class ItemMixin(TableObject):
+class AcquireItemMixin(TableObject):
+    flag = 't'
+
+    @classmethod
+    def get_item_by_type_index(self, item_type, item_index):
+        if item_type in ItemMixin.ITEM_TYPE_MAP:
+            obj = ItemMixin.ITEM_TYPE_MAP[item_type]
+            return obj.get(item_index)
+        return None
+
+    @property
+    def item(self):
+        return self.get_item_by_type_index(self.item_type, self.item_index)
+
+    @property
+    def old_item(self):
+        return self.get_item_by_type_index(self.old_data['item_type'],
+                                           self.old_data['item_index'])
+
+    @property
+    def name(self):
+        item = self.item
+        if item is None:
+            return 'NONE'
+        return item.name
+
+    def mutate(self):
+        item = self.item
+        if item is None:
+            candidates = [i for i in ItemMixin.ranked_shuffle_items
+                          if 0 <= i.old_data['price'] <= self.value]
+            item = candidates[-1]
+        new_item = item.get_similar(random_degree=self.random_degree)
+        self.item_index = new_item.index
+        self.item_type = ItemMixin.item_type_from_item(new_item)
+
+
+class ItemMixin(NameMixin):
     @classproperty
     def ITEM_TYPE_MAP(self):
         return {
@@ -42,34 +80,122 @@ class ItemMixin(TableObject):
             4: KeyItemObject,
             }
 
-    @property
-    def item(self):
-        if self.item_type in self.ITEM_TYPE_MAP:
-            obj = self.ITEM_TYPE_MAP[self.item_type]
-            return obj.get(self.item_index)
-        return None
+    @classmethod
+    def item_type_from_item(self, item):
+        for k in sorted(ItemMixin.ITEM_TYPE_MAP):
+            if isinstance(item, ItemMixin.ITEM_TYPE_MAP[k]):
+                return k
+
+    @classproperty
+    def shuffle_items(self):
+        if hasattr(self, '_shuffle_items'):
+            return self._shuffle_items
+
+        shuffle_items = (
+            ItemObject.every +
+            WeaponObject.every +
+            ArmorObject.every +
+            AccessoryObject.every
+            )
+        shuffle_items = [i for i in shuffle_items if i.index > 0
+                         and i.intershuffle_valid]
+        self._shuffle_items = shuffle_items
+
+        return self.shuffle_items
+
+    @classproperty
+    def ranked_shuffle_items(self):
+        if hasattr(self, '_ranked_shuffle_items'):
+            return self._ranked_shuffle_items
+
+        self._ranked_shuffle_items = sorted(
+            self.shuffle_items, key=lambda i: (i.rank, i.signature, i.name))
+        return self.ranked_shuffle_items
 
     @property
-    def name(self):
-        item = self.item
-        if item is None:
-            return 'NONE'
-        return item.name
+    def rank(self):
+        if hasattr(self, '_rank'):
+            return self._rank
+
+        sorted_items = sorted(
+            self.shuffle_items, key=lambda i: (
+                i.old_data['price'], i.signature, i.name))
+
+        max_index = len(sorted_items)-1
+        for (n, i) in enumerate(sorted_items):
+            i._global_rank = n / max_index
+
+        for obj_class in [ItemObject, WeaponObject,
+                          ArmorObject, AccessoryObject]:
+            for i in obj_class.every:
+                i._rank = -1
+
+            sorted_local = [i for i in sorted_items
+                            if isinstance(i, obj_class)]
+            max_index = len(sorted_local)-1
+            for (n, i) in enumerate(sorted_local):
+                i._local_rank = n / max_index
+
+        for i in sorted_items:
+            i._rank = (i._local_rank + i._global_rank) / 2
+
+        sorted_items = sorted(
+            self.shuffle_items, key=lambda i: (i._rank, i.signature, i.name))
+
+        max_index = len(sorted_items)-1
+        for n, i in enumerate(sorted_items):
+            i._rank = n / max_index
+
+        return self.rank
+
+    def get_similar(self, candidates=None, random_degree=None):
+        if candidates is None:
+            candidates = ItemMixin.ranked_shuffle_items
+        new_item = super().get_similar(candidates=candidates,
+                                       random_degree=random_degree)
+        return new_item
 
 
-class FairyGiftObject(ItemMixin): pass
-class FairyExploreObject(ItemMixin): pass
+class DupeMixin:
+    @property
+    def fingerprint(self):
+        return str(sorted(self.old_data.items()))
+
+    def cleanup(self):
+        if hasattr(self, 'memory') and self.memory == 0xff:
+            return
+        for o in sorted(self.every, key=lambda oo: oo.index):
+            if o.index >= self.index:
+                break
+            if o.fingerprint == self.fingerprint:
+                for attr in self.old_data:
+                    setattr(self, attr, getattr(o, attr))
+
+
+class FairyGiftObject(AcquireItemMixin): pass
+class FairyExploreObject(AcquireItemMixin): pass
 class FairyObject(NameMixin): pass
-class FairyPrizeObject(ItemMixin): pass
-class ItemObject(NameMixin): pass
+class FairyPrizeObject(AcquireItemMixin): pass
+
+
+class ItemObject(ItemMixin):
+    @property
+    def intershuffle_valid(self):
+        WHITELIST = []
+        return self.index < 0x4e or self.index in WHITELIST
+
+
 class KeyItemObject(NameMixin): pass
-class WeaponObject(NameMixin): pass
-class ArmorObject(NameMixin): pass
-class AccessoryObject(NameMixin): pass
+class WeaponObject(ItemMixin): pass
+class ArmorObject(ItemMixin): pass
+class AccessoryObject(ItemMixin): pass
 class AbilityObject(NameMixin): pass
 class LevelObject(TableObject): pass
 
 class ShopObject(TableObject):
+    flag = 's'
+    flag_description = 'shops and trades'
+
     def __repr__(self):
         s = 'SHOP {0:0>2X} {1:0>2X}\n'.format(self.index, self.unknown)
         for item in self.items:
@@ -106,17 +232,26 @@ class BaseStatsObject(NameMixin):
             self.base_max_hp = 999
 
 
-class ChestObject(ItemMixin):
+class ChestObject(DupeMixin, AcquireItemMixin):
+    flag_description = 'treasure'
+
     def __repr__(self):
         if self.item:
             s = 'CHEST {0:0>2X} ({1:0>3}-{2:0>2x}): {3}'.format(
                 self.index, self.area_code, self.memory, self.item.name)
         else:
             assert self.item_type == 0xFF
-            zenny = '{0}Z'.format(self.item_index * 40)
+            zenny = '{0}Z'.format(self.value)
             s = 'CHEST {0:0>2X} ({1:0>3}-{2:0>2x}): {3}'.format(
                 self.index, self.area_code, self.memory, zenny)
         return s
+
+    @property
+    def value(self):
+        if self.item:
+            return self.item.old_data['price']
+        assert self.item_type == 0xFF
+        return self.item_index * 40
 
     @property
     def area_code(self):
@@ -165,7 +300,9 @@ class FormationObject(TableObject):
                 self.monster_indexes = [0xff]*8
 
 
-class ManilloItemObject(ItemMixin):
+class ManilloItemObject(DupeMixin, AcquireItemMixin):
+    flag = 's'
+
     def __repr__(self):
         fishdesc = ', '.join(
             '{0} x{1}'.format(fish.name, n) for (fish, n) in self.fishes)
@@ -182,6 +319,72 @@ class ManilloItemObject(ItemMixin):
             fish = ItemObject.get(0x38 + i)
             fishes.append((fish, n))
         return fishes
+
+    def mutate(self):
+        super().mutate()
+        if self.random_degree == 0:
+            return
+
+        old_fish_value = 0
+        for (fish, n) in self.fishes:
+            old_fish_value += (fish.old_data['price'] * n)
+
+        values = [self.old_item.old_data['price'],
+                  self.old_item.price,
+                  self.item.old_data['price'],
+                  self.item.price]
+
+        old_item_value = self.old_item.old_data['price']
+        target_value = random.randint(min(values), max(values))
+        target_fish_value = target_value * old_fish_value / old_item_value
+        new_fishes = [(None, 0), (None, 0), (None, 0)]
+        candidate_fishes = sorted(
+            [ItemObject.get(i) for i in range(0x38, 0x4d)],
+            key=lambda i: i.old_data['price'])
+        target_fish_value = max(
+            target_fish_value, min([f.old_data['price']
+                                    for f in candidate_fishes]))
+        max_index = len(candidate_fishes)-1
+        while True:
+            index = int(round(
+                (random.random() ** (1/self.random_degree)) * max_index))
+            replacement_fish = candidate_fishes[index]
+            if replacement_fish.old_data['price'] > target_fish_value * 2:
+                continue
+            for (fish, n) in new_fishes:
+                if fish == replacement_fish:
+                    replace_fish = fish
+                    replace_quantity = n
+                    replacement_quantity = n + 1
+                    break
+            else:
+                replace_fish, replace_quantity = random.choice(new_fishes)
+                if replace_fish is not None:
+                    replace_value = (replace_fish.old_data['price']
+                                     * replace_quantity)
+                    replacement_quantity = ceil(
+                        replace_value / replacement_fish.old_data['price'])
+                else:
+                    replacement_quantity = random.randint(
+                        1, random.randint(1, 9))
+
+            if 1 <= replacement_quantity <= 9:
+                new_fishes.remove((replace_fish, replace_quantity))
+                new_fishes.append((replacement_fish, replacement_quantity))
+            else:
+                continue
+
+            current_value = 0
+            for (fish, n) in new_fishes:
+                if fish is None:
+                    continue
+                current_value += (fish.old_data['price'] * n)
+            if current_value >= target_fish_value:
+                break
+
+        self.fish_indexes = [fish.index-0x38 if fish else 0xFF
+                             for fish, n in new_fishes]
+        self.fish_quantities = [n if fish else 0 for fish, n in new_fishes]
 
 
 class MonsterObject(NameMixin):
@@ -205,6 +408,7 @@ if __name__ == '__main__':
                       custom_degree=True)
 
         clean_and_write(ALL_OBJECTS)
+
         finish_interface()
 
     except Exception:
