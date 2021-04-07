@@ -1,0 +1,2 @@
+fairy_name,5,str
+stats,4,list

@@ -31,6 +31,36 @@ class NameMixin(TableObject):
         return name.decode('ascii').rstrip('\x00')
 
 
+class ItemMixin(TableObject):
+    @classproperty
+    def ITEM_TYPE_MAP(self):
+        return {
+            0: ItemObject,
+            1: WeaponObject,
+            2: ArmorObject,
+            3: AccessoryObject,
+            4: KeyItemObject,
+            }
+
+    @property
+    def item(self):
+        if self.item_type in self.ITEM_TYPE_MAP:
+            obj = self.ITEM_TYPE_MAP[self.item_type]
+            return obj.get(self.item_index)
+        return None
+
+    @property
+    def name(self):
+        item = self.item
+        if item is None:
+            return 'NONE'
+        return item.name
+
+
+class FairyGiftObject(ItemMixin): pass
+class FairyExploreObject(ItemMixin): pass
+class FairyObject(NameMixin): pass
+class FairyPrizeObject(ItemMixin): pass
 class ItemObject(NameMixin): pass
 class KeyItemObject(NameMixin): pass
 class WeaponObject(NameMixin): pass
@@ -40,14 +70,6 @@ class AbilityObject(NameMixin): pass
 class LevelObject(TableObject): pass
 
 class ShopObject(TableObject):
-    ITEM_TYPE_MAP = {
-        0: ItemObject,
-        1: WeaponObject,
-        2: ArmorObject,
-        3: AccessoryObject,
-        4: KeyItemObject,
-        }
-
     def __repr__(self):
         s = 'SHOP {0:0>2X} {1:0>2X}\n'.format(self.index, self.unknown)
         for item in self.items:
@@ -67,7 +89,7 @@ class ShopObject(TableObject):
     def items(self):
         items = []
         for item_type, item_index in zip(self.item_types, self.item_indexes):
-            obj = self.ITEM_TYPE_MAP[item_type]
+            obj = ItemMixin.ITEM_TYPE_MAP[item_type]
             item = obj.get(item_index)
             items.append(item)
         return items
@@ -84,7 +106,7 @@ class BaseStatsObject(NameMixin):
             self.base_max_hp = 999
 
 
-class ChestObject(TableObject):
+class ChestObject(ItemMixin):
     def __repr__(self):
         if self.item:
             s = 'CHEST {0:0>2X} ({1:0>3}-{2:0>2x}): {3}'.format(
@@ -101,13 +123,6 @@ class ChestObject(TableObject):
         filename = self.filename[-11:]
         assert filename.startswith('AREA') and filename.endswith('.EMI')
         return int(filename[-7:-4])
-
-    @property
-    def item(self):
-        if self.item_type in ShopObject.ITEM_TYPE_MAP:
-            obj = ShopObject.ITEM_TYPE_MAP[self.item_type]
-            return obj.get(self.item_index)
-        return None
 
 
 class GeneObject(TableObject):
@@ -150,18 +165,13 @@ class FormationObject(TableObject):
                 self.monster_indexes = [0xff]*8
 
 
-class ManilloItemObject(TableObject):
+class ManilloItemObject(ItemMixin):
     def __repr__(self):
         fishdesc = ', '.join(
             '{0} x{1}'.format(fish.name, n) for (fish, n) in self.fishes)
         s = 'TRADE {0:0>2X}: {1} ({2})'.format(
             self.index, self.item.name, fishdesc)
         return s.strip()
-
-    @property
-    def item(self):
-        obj = ShopObject.ITEM_TYPE_MAP[self.item_type]
-        return obj.get(self.item_index)
 
     @property
     def fishes(self):

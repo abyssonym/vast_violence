@@ -1,0 +1,3 @@
+num_battles,2
+item_index,1
+item_type,1
