@@ -10,7 +10,7 @@ level,1
 unknown4,3,list
 initial_skills,8,list
 hp,2
-mp,2
+ap,2
 str,2
 def,2
 agi,2

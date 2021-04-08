@@ -10,7 +10,7 @@ AccessoryObject     struct_accessory.txt        34e7c@BIN/ETC/GAME.EMI      52
 AbilityObject       struct_ability.txt          3570c@BIN/ETC/GAME.EMI      228
 LevelObject         struct_level.txt            368dc@BIN/ETC/GAME.EMI      693
 ShopObject          struct_shop.txt             3528c@BIN/ETC/GAME.EMI      40
-MasterSkillObject   struct_master_skill.txt     03c88@BIN/ETC/SISYOU.EMI    17
+MasterSkillsObject  struct_master_skills.txt    03c88@BIN/ETC/SISYOU.EMI    17
 MasterStatsObject   struct_master_stats.txt     03d54@BIN/ETC/SISYOU.EMI    17
 BaseStatsObject     struct_base_stats.txt       72914@BIN/ETC/START.EMI     8
 ChestObject         struct_chest.txt            pointers_chests.txt

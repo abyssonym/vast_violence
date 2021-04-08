@@ -1,8 +1,10 @@
 ability_name,12,str
-misc,bit:u0 u1 u2 u3 u4 u5 u6 u7
-unknown1,1
+misc,bit:u0 u1 u2 u3 u4 default_target_enemy u6 u7
+# lower two bits are skill type, upper six bits unknown
+# 3 for examinable skills
+skill_type,1
 cost,1
 power,1
 element,bit:fire ice lightning earth wind holy psionic status
-unknown2,1
+unknown2,bit:u20 examinable u22 u23 u24 u25 u26 u27
 unknown3,2
