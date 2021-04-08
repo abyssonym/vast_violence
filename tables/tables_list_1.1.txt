@@ -19,3 +19,9 @@ FormationObject     struct_formation.txt        pointers_formations.txt
 ManilloItemObject   struct_manillo_item.txt     pointers_manillo_items.txt
 MonsterObject       struct_monster.txt          pointers_monsters.txt
 .patch              patch_flame_gene.txt
+$seed1a             1571
+$seed1b             3c571
+$seed1len           14
+$seed2a             1598
+$seed2b             3c598
+$seed2len           c

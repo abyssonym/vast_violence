@@ -1,6 +1,6 @@
 from randomtools.tablereader import (
     TableObject, addresses, get_activated_patches, get_open_file,
-    mutate_normal)
+    mutate_normal, get_seed)
 from randomtools.utils import (
     classproperty, cached_property, utilrandom as random)
 from randomtools.interface import (
@@ -1037,6 +1037,31 @@ class MonsterObject(DupeMixin, NameMixin):
             self.hp = min(self.old_data['hp'], 1)
 
 
+def write_seed_number():
+    seed1 = 'Seed: {0}'.format(get_seed())
+    while len(seed1) < addresses.seed1len:
+        seed1 += ' '
+    assert len(seed1) == addresses.seed1len
+    seed2 = '{0}'.format(get_seed())
+    while len(seed2) < addresses.seed2len:
+        seed2 += ' '
+    assert len(seed2) == addresses.seed2len
+    seed1 = seed1.encode('ascii').replace(b' ', b'\xff')
+    seed1 = seed1.replace(b':', b'\x8f')
+    seed2 = seed2.encode('ascii').replace(b' ', b'\xff')
+
+    a = get_open_file('BIN/ETC/AFLDKWA.EMI', sandbox=True)
+    b = get_open_file('BIN/ETC/FIRST.EMI', sandbox=True)
+    a.seek(addresses.seed1a)
+    a.write(seed1)
+    a.seek(addresses.seed2a)
+    a.write(seed2)
+    b.seek(addresses.seed1b)
+    b.write(seed1)
+    b.seek(addresses.seed2b)
+    b.write(seed2)
+
+
 if __name__ == '__main__':
     try:
         print('You are using the Breath of Fire III '
@@ -1051,6 +1076,7 @@ if __name__ == '__main__':
         run_interface(ALL_OBJECTS, snes=False, codes=codes,
                       custom_degree=True)
 
+        write_seed_number()
         clean_and_write(ALL_OBJECTS)
 
         finish_interface()
