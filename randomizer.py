@@ -404,16 +404,30 @@ class ShopObject(TableObject):
             (i.index << 8) | self.item_type_from_item(i) for i in items]
         assert self.items == items
 
+    @classproperty
+    def item_pools(self):
+        if hasattr(ShopObject, '_item_pools'):
+            return ShopObject._item_pools
+
+        item_pools = {}
+        for i in (ItemObject.every + WeaponObject.every +
+                  ArmorObject.every + AccessoryObject.every):
+            item_pools[i] = []
+            for s in ShopObject.every:
+                old_items = [i for i in s.old_items if i.index > 0]
+                if i in old_items:
+                    item_pools[i] += old_items
+        ShopObject._item_pools = item_pools
+
+        return ShopObject.item_pools
+
     def mutate(self):
         random_degree = self.random_degree ** 0.5
-        candidates = []
 
         valid_items = [i for i in self.old_items if i.index > 0]
-        for s in ShopObject.every:
-            shop_items = [i for i in s.old_items if i.index > 0]
-            for i in valid_items:
-                if i in shop_items:
-                    candidates += shop_items
+        candidates = []
+        for i in valid_items:
+            candidates += ShopObject.item_pools[i]
         candidates = sorted(candidates, key=lambda i: i.rank)
 
         duplicates_allowed = len(set(valid_items)) != len(valid_items)
@@ -429,11 +443,15 @@ class ShopObject(TableObject):
             else:
                 my_candidates = list(candidates)
 
+            index = my_candidates.index(i)
+            my_candidates[index] = None
+            my_candidates = [c for c in my_candidates if c is not i]
             if not duplicates_allowed:
                 my_candidates = [c for c in my_candidates
-                                 if c is i or c not in new_items]
-            while my_candidates.count(i) > 1:
-                my_candidates.remove(i)
+                                 if c not in new_items]
+            index = my_candidates.index(None)
+            my_candidates[index] = i
+            assert my_candidates.count(i) == 1
 
             index = my_candidates.index(i)
             if i in new_items:
