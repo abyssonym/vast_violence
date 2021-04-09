@@ -17,8 +17,8 @@ fatigue,1
 master,1
 max_hp,2
 max_ap,2
-atk,2
-def,2
+pwr,2
+dfn,2
 agi,2
 int,2
 unknown2,2,list
@@ -32,8 +32,8 @@ accuracy,1
 unknown3,3,list
 base_max_hp,2
 base_max_ap,2
-base_atk,2
-base_def,2
+base_pwr,2
+base_dfn,2
 base_agi,2
 base_int,2
 unknown4,2,list

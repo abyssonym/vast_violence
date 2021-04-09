@@ -11,8 +11,8 @@ unknown4,3,list
 initial_skills,8,list
 hp,2
 ap,2
-str,2
-def,2
+pwr,2
+dfn,2
 agi,2
 int,2
 steal_item_index,1

@@ -1,6 +1,6 @@
 hp,1
 ap,1
-str,1
-def,1
+pwr,1
+dfn,1
 agi,1
 int,1

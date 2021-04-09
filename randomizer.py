@@ -236,21 +236,31 @@ class AbilityObject(NameMixin):
         return not self.intershuffle_valid
 
     @cached_property
-    def canonical(self):
+    def examine_alt(self):
+        if self.name == 'Noting':
+            return None
         selves = [a for a in self.every if a.name == self.name]
         if len(selves) == 1:
             return self
-        canonicals = [a for a in selves if not a.is_spare_levelup_skill]
-        if len(canonicals) > 1:
-            canonicals = [a for a in canonicals if a.get_bit('examinable')]
-        assert len(canonicals) <= 1
-        if canonicals:
-            return canonicals[0]
+        examinable = [a for a in selves if a.get_bit('examinable')]
+        assert len(examinable) <= 1
+        if examinable:
+            return examinable[0]
         return None
 
-    @property
-    def is_canonical(self):
-        return self.canonical is self
+    @cached_property
+    def levelup_alt(self):
+        if self.name == 'Noting':
+            return None
+        selves = [a for a in self.every if a.name == self.name]
+        if len(selves) == 1:
+            return self
+        unexaminable = [a for a in selves if not a.get_bit('examinable')]
+        if len(unexaminable) > 1:
+            return sorted(unexaminable, key=lambda a: a.index)[0]
+        if unexaminable:
+            return unexaminable[0]
+        return None
 
     @property
     def is_offense(self):
@@ -340,9 +350,36 @@ class AbilityObject(NameMixin):
 
 
 class LevelObject(TableObject):
+    def __repr__(self):
+        s = '{0:5} {1:0>2}'.format(self.charname, self.level)
+        for attr in ['hp', 'ap', 'pwr', 'dfn', 'agi', 'int']:
+            value = getattr(self, attr)
+            s += ' | {0}: {1}'.format(attr, value)
+        return s
+
     @property
     def level(self):
         return (self.index % 99) + 1
+
+    @property
+    def charname(self):
+        return BaseStatsObject.get(self.index // 99).name
+
+    @property
+    def pwr(self):
+        return self.pwr_dfn >> 4
+
+    @property
+    def dfn(self):
+        return self.pwr_dfn & 0xf
+
+    @property
+    def agi(self):
+        return self.agi_int >> 4
+
+    @property
+    def int(self):
+        return self.agi_int & 0xf
 
 
 class ShopObject(TableObject):
@@ -488,6 +525,10 @@ class MasterSkillsObject(TableObject):
 
     RESTRICTED_NAMES = ['Bais', 'Lang', 'Lee', 'Wynn']
 
+    @classproperty
+    def after_order(self):
+        return [BaseStatsObject]
+
     def __repr__(self):
         if self.name in self.RESTRICTED_NAMES:
             return ''
@@ -531,6 +572,14 @@ class MasterSkillsObject(TableObject):
             return
         if self.name in self.RESTRICTED_NAMES:
             return
+
+        banned_skills = {
+            AbilityObject.get(l.ability) for l in LevelObject.every
+            if l.ability > 0
+            and l.charname not in BaseStatsObject.RESTRICTED_NAMES}
+        candidates = [a for a in AbilityObject.every if a.rank >= 0
+                      and a not in banned_skills and a is a.examine_alt]
+
         target_nums = [len(mso.skills) for mso in self.every
                        if mso.name not in self.RESTRICTED_NAMES]
         target_num_skills = random.choice(target_nums)
@@ -538,13 +587,20 @@ class MasterSkillsObject(TableObject):
         while len(new_skills) < target_num_skills:
             base = random.choice(self.skills)
             assert base.intershuffle_valid
-            new_skill = base.get_similar(random_degree=self.random_degree)
-            assert new_skill.is_canonical
+            new_skill = base.get_similar(candidates=candidates,
+                                         override_outsider=True,
+                                         random_degree=self.random_degree)
+            assert new_skill is new_skill.examine_alt
             if new_skill not in new_skills:
                 new_skills.append(new_skill)
         new_levels = random.choice([mso.levels for mso in self.every
                                     if len(mso.levels) == target_num_skills])
         self.set_skills(new_skills, new_levels)
+
+    def preclean(self):
+        for skill in self.skills:
+            skill.set_bit('examinable', True)
+            skill.reset_skill_type(AbilityObject.EXAMINE_SKILL)
 
     def cleanup(self):
         if self.name in self.RESTRICTED_NAMES:
@@ -552,8 +608,8 @@ class MasterSkillsObject(TableObject):
                 setattr(self, attr, self.old_data[attr])
 
         for skill in self.skills:
-            assert skill.intershuffle_valid
-            skill.set_bit('examinable', True)
+            assert skill.get_bit('examinable')
+            assert skill.skill_type & 3 == AbilityObject.EXAMINE_SKILL
 
 
 class MasterStatsObject(TableObject):
@@ -599,7 +655,7 @@ class MasterStatsObject(TableObject):
     def randomize(self):
         ratings = [mso.rating for mso in self.every]
         target_rating = random.choice(ratings)
-        swappable_stats = [('hp', 'ap'), ('str', 'def', 'agi', 'int')]
+        swappable_stats = [('hp', 'ap'), ('pwr', 'dfn', 'agi', 'int')]
         stat_pools = defaultdict(list)
         for attr in self.old_data:
             swappable = [s for s in swappable_stats if attr in s][0]
@@ -665,7 +721,8 @@ class BaseStatsObject(NameMixin):
         SKILL_TYPE_MAX_COUNT = 10
         for l in base_levels:
             while True:
-                base_rank = AbilityObject.get(l.old_data['ability']).canonical
+                base_rank = AbilityObject.get(
+                    l.old_data['ability']).levelup_alt
                 base_misc = AbilityObject.get(
                     random.choice(base_levels).old_data['ability'])
 
@@ -679,7 +736,7 @@ class BaseStatsObject(NameMixin):
                 candidates = [c for c in AbilityObject.every
                               if c.is_offense == base_misc.is_offense
                               and c.is_utility == base_misc.is_utility
-                              and c.is_canonical and c.rank >= 0]
+                              and c is c.levelup_alt and c.rank >= 0]
                 for e in shuffled_elements:
                     if base_misc.get_bit(e):
                         index = shuffled_elements.index(e)
@@ -694,9 +751,19 @@ class BaseStatsObject(NameMixin):
                     candidates=candidates, override_outsider=True,
                     random_degree=AbilityObject.random_degree,
                     allow_intershuffle_invalid=True)
+                new_skill = new_skill.levelup_alt
 
                 assert base_rank in candidates or new_skill is not base_rank
                 if new_skill not in new_skills:
+                    if new_skill.skill_type & 3 != AbilityObject.EXAMINE_SKILL:
+                        skill_type = new_skill.skill_type & 3
+                        count = skill_type_counts[skill_type]
+                        if (count >= SKILL_TYPE_MAX_COUNT):
+                            continue
+                    else:
+                        new_skill.reset_skill_type()
+                    if new_skill.get_bit('examinable'):
+                        new_skill.set_bit('examinable', False)
                     new_skills.append(new_skill)
                     skill_type_counts[skill_type] += 1
                     break
@@ -727,63 +794,27 @@ class BaseStatsObject(NameMixin):
         if AbilityObject.flag in get_flags():
             self.mutate_skills()
 
-    @classmethod
-    def consume_spares(self):
-        spares = [a for a in AbilityObject.every if a.is_spare_levelup_skill]
-        spares += [a for a in AbilityObject.every if a.name == 'Noting'
-                   and a._monster_rank is None]
-        skill_levels = [l for b in BaseStatsObject.every for l in b.levels
-                        if b.name not in self.RESTRICTED_NAMES
-                        and l.ability > 0]
-        skills = set(AbilityObject.get(l.ability) for l in skill_levels)
-
-        if len(skills) > len(spares):
-            for mso in MasterSkillsObject.every:
-                skills -= set(mso.skills)
-
-        assert not set(skills) & set(spares)
-        skills = sorted(skills, key=lambda s: (s.rank, s.index))
-        if len(skills) > len(spares):
-            skills = skills[-len(spares):]
-        assert len(spares) >= len(skills)
-        skill_map = {}
-        for s in skills:
-            spare = spares.pop()
-            spare.copy_data(s)
-            assert spare.name == s.name
-            spare.set_bit('examinable', False)
-            spare.reset_skill_type()
-            s.reset_skill_type(AbilityObject.EXAMINE_SKILL)
-            assert spare.skill_type & 3 != AbilityObject.EXAMINE_SKILL
-            skill_map[s.index] = spare.index
-
-        for sl in skill_levels:
-            assert sl.ability > 0
-            if sl.ability in skill_map:
-                sl.ability = skill_map[sl.ability]
-
-    @classmethod
-    def full_cleanup(self):
-        if AbilityObject.flag in get_flags() and self.flag in get_flags():
-            self.consume_spares()
-        super().full_cleanup()
-
     def cleanup(self):
         for ability_type in ['healing', 'assist', 'attack', 'skills']:
             setattr(self, '%s_abilities' % ability_type, list([]))
 
         for l in self.levels:
-            if l.level <= self.level and l.ability > 0:
+            if l.ability > 0:
                 skill = AbilityObject.get(l.ability)
                 skill_type = skill.skill_type & 3
-                if skill_type == AbilityObject.HEALING_SKILL:
-                    self.healing_abilities.append(skill.index)
-                elif skill_type == AbilityObject.ASSIST_SKILL:
-                    self.assist_abilities.append(skill.index)
-                elif skill_type == AbilityObject.ATTACK_SKILL:
-                    self.attack_abilities.append(skill.index)
-                elif skill_type == AbilityObject.EXAMINE_SKILL:
-                    self.skills_abilities.append(skill.index)
+                if self.name not in self.RESTRICTED_NAMES:
+                    assert not skill.get_bit('examinable')
+                    assert skill_type != AbilityObject.EXAMINE_SKILL
+
+                if l.level <= self.level:
+                    if skill_type == AbilityObject.HEALING_SKILL:
+                        self.healing_abilities.append(skill.index)
+                    elif skill_type == AbilityObject.ASSIST_SKILL:
+                        self.assist_abilities.append(skill.index)
+                    elif skill_type == AbilityObject.ATTACK_SKILL:
+                        self.attack_abilities.append(skill.index)
+                    elif skill_type == AbilityObject.EXAMINE_SKILL:
+                        self.skills_abilities.append(skill.index)
 
         for ability_type in ['healing', 'assist', 'attack', 'skills']:
             attr = '%s_abilities' % ability_type
