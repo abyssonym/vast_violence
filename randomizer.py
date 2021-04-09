@@ -606,7 +606,9 @@ class MasterSkillsObject(TableObject):
                        if mso.name not in self.RESTRICTED_NAMES]
         target_num_skills = random.choice(target_nums)
         new_skills = []
-        while len(new_skills) < target_num_skills:
+        for _ in range(1000):
+            if len(new_skills) >= target_num_skills:
+                break
             base = random.choice(self.skills)
             assert base.intershuffle_valid
             new_skill = base.get_similar(candidates=candidates,
@@ -615,6 +617,8 @@ class MasterSkillsObject(TableObject):
             assert new_skill is new_skill.examine_alt
             if new_skill not in new_skills:
                 new_skills.append(new_skill)
+        else:
+            target_num_skills = len(new_skills)
         new_levels = random.choice([mso.levels for mso in self.every
                                     if len(mso.levels) == target_num_skills])
         self.set_skills(new_skills, new_levels)
