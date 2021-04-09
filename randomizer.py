@@ -365,6 +365,28 @@ class LevelObject(TableObject):
     def charname(self):
         return BaseStatsObject.get(self.index // 99).name
 
+    def set_stat(self, stat, value):
+        for attr in self.old_data:
+            old_value = getattr(self, attr)
+            if attr == stat:
+                setattr(self, attr, value)
+            elif attr.startswith(stat):
+                old_value &= 0xf
+                old_value |= (value << 4)
+            elif attr.endswith(stat):
+                old_value &= 0xf0
+                old_value |= value
+                return self.old_data[attr] & 0xf
+
+    def get_old_stat(self, stat):
+        for attr in self.old_data:
+            if attr == stat:
+                return self.old_data[attr]
+            elif attr.startswith(stat):
+                return self.old_data[attr] >> 4
+            elif attr.endswith(stat):
+                return self.old_data[attr] & 0xf
+
     @property
     def pwr(self):
         return self.pwr_dfn >> 4
@@ -598,6 +620,9 @@ class MasterSkillsObject(TableObject):
         self.set_skills(new_skills, new_levels)
 
     def preclean(self):
+        if self.name in self.RESTRICTED_NAMES:
+            return
+
         for skill in self.skills:
             skill.set_bit('examinable', True)
             skill.reset_skill_type(AbilityObject.EXAMINE_SKILL)
@@ -606,6 +631,7 @@ class MasterSkillsObject(TableObject):
         if self.name in self.RESTRICTED_NAMES:
             for attr in self.old_data:
                 setattr(self, attr, self.old_data[attr])
+            return
 
         for skill in self.skills:
             assert skill.get_bit('examinable')
@@ -687,6 +713,28 @@ class BaseStatsObject(NameMixin):
     flag_description = 'characters'
     RESTRICTED_NAMES = ['Teepo', 'Whelp']
 
+    def __repr__(self):
+        stats = ['hp', 'ap', 'pwr', 'dfn', 'agi', 'int']
+        s = '{0:0>2X} {1}\n'.format(self.index, self.name)
+        '''
+        s += ' | '.join('{0:3}: {1:>2}'.format(
+            stat.upper(), self.old_data[stat]) for stat in stats)
+        s += '\n'
+        for l in self.levels:
+            if l.level <= self.level:
+                s += '{0}\n'.format(l)
+            else:
+                break
+        '''
+        s += ' | '.join('{0:3}: {1:>2}'.format(
+            stat.upper(), getattr(self, stat)) for stat in stats) + '\n'
+        for l in self.levels:
+            if l.ability > 0:
+                skill = AbilityObject.get(l.ability)
+                s += ' - LV{0:0>2} {1} ({2})\n'.format(l.level,
+                                                       skill.name, skill.cost)
+        return s.strip()
+
     @property
     def intershuffle_valid(self):
         return self.name not in self.RESTRICTED_NAMES
@@ -701,6 +749,31 @@ class BaseStatsObject(NameMixin):
     @property
     def levels(self):
         return [l for l in LevelObject.every if l.index // 99 == self.index]
+
+    @property
+    def delevel_stats(self):
+        stats = ['hp', 'ap', 'pwr', 'dfn', 'agi', 'int']
+        stats_values = {}
+        for stat in stats:
+            assert self.old_data[stat] == self.old_data['base_%s' % stat]
+            stats_values[stat] = self.old_data[stat]
+
+        for i in range(self.level, 1, -1):
+            level_data = self.levels[i-1]
+            for stat in stats:
+                stats_values[stat] -= level_data.get_old_stat(stat)
+        return stats_values
+
+    def relevel_stats(self, stats_values=None):
+        if not self.levels:
+            return stats_values
+        if stats_values is None:
+            stats_values = self.delevel_stats
+        for i in range(self.level + 1):
+            level_data = self.levels[i]
+            for stat in sorted(stats_values):
+                stats_values[stat] += getattr(level_data, stat)
+        return stats_values
 
     def mutate_skills(self):
         if not self.levels:
@@ -789,8 +862,28 @@ class BaseStatsObject(NameMixin):
             else:
                 l.ability = 0
 
+    def mutate_stats(self):
+        bases = [bso for bso in BaseStatsObject.every
+                 if bso.name not in bso.RESTRICTED_NAMES]
+        stats = sorted(self.delevel_stats.keys())
+        chosen_bases = {}
+        initial_stats = {}
+        for s in stats:
+            chosen_bases[s] = random.choice(bases)
+            for old_l, new_l in zip(self.levels, chosen_bases[s].levels):
+                new_value = new_l.get_old_stat(s)
+                old_l.set_stat(s, new_value)
+                initial_stats[s] = chosen_bases[s].delevel_stats[s]
+
+        new_stats = self.relevel_stats(initial_stats)
+        for attr, value in sorted(new_stats.items()):
+            assert hasattr(self, attr)
+            setattr(self, attr, value)
+
     def mutate(self):
         super().mutate()
+        self.mutate_stats()
+        self.reseed('skills')
         if AbilityObject.flag in get_flags():
             self.mutate_skills()
 
@@ -824,7 +917,12 @@ class BaseStatsObject(NameMixin):
                 getattr(self, attr).append(0)
             assert len(getattr(self, attr)) == len(self.old_data[attr])
 
-        # TODO: clean up stats modified by equipment
+        for attr in sorted(self.old_data):
+            other_attrs = ['base_%s' % attr, 'current_%s' % attr]
+            for other in other_attrs:
+                if other in self.old_data:
+                    setattr(self, other, getattr(self, attr))
+
         if 'easymodo' in get_activated_codes():
             self.accuracy = 100
             self.base_accuracy = 100
@@ -949,13 +1047,15 @@ class ManilloItemObject(DupeMixin, AcquireItemMixin):
         target_fish_value = max(
             target_fish_value, min([f.old_data['price']
                                     for f in candidate_fishes]))
+        candidate_fishes = [c for c in candidate_fishes
+                            if c.old_data['price'] <= target_fish_value * 2]
         max_index = len(candidate_fishes)-1
+        stagnation_counter = 0
+        MAX_STAGNATION = 20
         while True:
             index = int(round(
                 (random.random() ** (1/self.random_degree)) * max_index))
             replacement_fish = candidate_fishes[index]
-            if replacement_fish.old_data['price'] > target_fish_value * 2:
-                continue
             for (fish, n) in new_fishes:
                 if fish == replacement_fish:
                     replace_fish = fish
@@ -974,9 +1074,13 @@ class ManilloItemObject(DupeMixin, AcquireItemMixin):
                         1, random.randint(1, 9))
 
             if 1 <= replacement_quantity <= 9:
+                stagnation_counter = 0
                 new_fishes.remove((replace_fish, replace_quantity))
                 new_fishes.append((replacement_fish, replacement_quantity))
             else:
+                stagnation_counter += 1
+                if stagnation_counter >= MAX_STAGNATION:
+                    break
                 continue
 
             current_value = 0
