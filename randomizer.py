@@ -173,7 +173,7 @@ class ItemMixin(NameMixin):
         return
 
     def mutate_equipability(self):
-        super().magic_mutate_bits()
+        super().magic_mutate_bits(random_degree=EquipmentObject.random_degree)
         names = {'ryu': 0x01,
                  'nina': 0x02,
                  'garr': 0x04,
