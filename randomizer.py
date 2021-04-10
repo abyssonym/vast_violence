@@ -35,6 +35,7 @@ class NameMixin(TableObject):
 
 class AcquireItemMixin(TableObject):
     flag = 't'
+    custom_random_enable = 't'
 
     @classmethod
     def get_item_by_type_index(self, item_type, item_index):
@@ -263,6 +264,7 @@ class DupeMixin:
 class EquipmentObject(TableObject):
     flag = 'q'
     flag_description = 'equippable items'
+    custom_random_enable = 'q'
 
 
 class FairyGiftObject(AcquireItemMixin): pass
@@ -287,6 +289,7 @@ class AccessoryObject(ItemMixin): pass
 class AbilityObject(NameMixin):
     flag = 'a'
     flag_description = 'abilities'
+    custom_random_enable = 'a'
 
     HEALING_SKILL = 0
     ASSIST_SKILL = 1
@@ -481,6 +484,7 @@ class LevelObject(TableObject):
 class ShopObject(TableObject):
     flag = 's'
     flag_description = 'shops and trades'
+    custom_random_enable = 's'
 
     def __repr__(self):
         s = 'SHOP {0:0>2X} {1:0>2X}\n'.format(self.index, self.unknown)
@@ -618,6 +622,7 @@ class ShopObject(TableObject):
 class MasterSkillsObject(TableObject):
     flag = 'm'
     flag_description = 'masters'
+    custom_random_enable = 'm'
 
     RESTRICTED_NAMES = ['Bais', 'Lang', 'Lee', 'Wynn']
 
@@ -718,6 +723,7 @@ class MasterSkillsObject(TableObject):
 
 class MasterStatsObject(TableObject):
     flag = 'm'
+    custom_random_enable = 'm'
     names = [
         'Bunyan', 'Mygas', 'Yggdrasil', "D'lonzo", 'Fahl',
         'Durandal', 'Giotto', 'Hondara', 'Emitai', 'Deis',
@@ -789,6 +795,7 @@ class MasterStatsObject(TableObject):
 class BaseStatsObject(NameMixin):
     flag = 'c'
     flag_description = 'characters'
+    custom_random_enable = 'c'
     RESTRICTED_NAMES = ['Teepo', 'Whelp']
 
     randomselect_attributes = [
@@ -1119,6 +1126,7 @@ class FormationObject(TableObject):
 
 class ManilloItemObject(DupeMixin, AcquireItemMixin):
     flag = 's'
+    custom_random_enable = 's'
 
     def __repr__(self):
         fishdesc = ', '.join(
@@ -1213,6 +1221,7 @@ class ManilloItemObject(DupeMixin, AcquireItemMixin):
 class MonsterObject(DupeMixin, NameMixin):
     flag = 'e'
     flag_description = 'enemies'
+    custom_random_enable = 'e'
     randomselect_attributes = [
         'hp', 'ap', 'pwr', 'dfn', 'agi', 'int',
         ('steal_item_type', 'steal_item_index', 'steal_rate'),
