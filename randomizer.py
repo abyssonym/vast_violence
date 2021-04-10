@@ -957,6 +957,27 @@ class BaseStatsObject(NameMixin):
             self.mutate_skills()
 
     def cleanup(self):
+        weapon = WeaponObject.get(self.weapon)
+        if not weapon.get_bit(self.name.lower()):
+            candidates = [w for w in WeaponObject.ranked if
+                          w.get_bit(self.name.lower())]
+            temp = [c for c in candidates
+                    if bin(c.equipability & 0xF7).count('1') == 1]
+            if temp:
+                candidates = temp
+            self.weapon = candidates[0].index
+
+        for attr in ['shield', 'helmet', 'armor']:
+            armor = ArmorObject.get(getattr(self, attr))
+            if not armor.get_bit(self.name.lower()):
+                setattr(self, attr, 0)
+
+        accessories = [AccessoryObject.get(a) for a in self.accessories]
+        accessories = [a for a in accessories if a.get_bit(self.name.lower())]
+        accessories = [a.index for a in accessories]
+        while len(accessories) < 2:
+            accessories.append(0)
+
         if self.flag in get_flags():
             for ability_type in ['healing', 'assist', 'attack', 'skills']:
                 setattr(self, '%s_abilities' % ability_type, list([]))
