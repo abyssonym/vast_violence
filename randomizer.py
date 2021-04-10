@@ -815,11 +815,11 @@ class BaseStatsObject(NameMixin):
                 self.attack_abilities + self.skills_abilities
                 if AbilityObject.get(a).name]
 
-    @property
+    @cached_property
     def levels(self):
         return [l for l in LevelObject.every if l.index // 99 == self.index]
 
-    @property
+    @cached_property
     def delevel_stats(self):
         stats = ['hp', 'ap', 'pwr', 'dfn', 'agi', 'int']
         stats_values = {}
