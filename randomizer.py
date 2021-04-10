@@ -239,6 +239,9 @@ class DupeMixin:
     @cached_property
     def canonical_relative(self):
         for o in sorted(self.every, key=lambda oo: oo.index):
+            if (isinstance(self, MonsterObject) and o is self and
+                    self.monster_name != self.old_data['monster_name']):
+                continue
             if o.index >= self.index:
                 return self
             if o.fingerprint == self.fingerprint:
@@ -406,7 +409,10 @@ class AbilityObject(NameMixin):
                     name_ranks[a.name] = set([])
                 name_ranks[a.name].add(rank_value)
 
-        del(name_ranks['Noting'])
+        for name in ['Nothing', 'Noting']:
+            if name in name_ranks:
+                del(name_ranks[name])
+
         for a in AbilityObject.every:
             if a.name in name_ranks:
                 ranks = name_ranks[a.name]
@@ -1207,14 +1213,53 @@ class ManilloItemObject(DupeMixin, AcquireItemMixin):
 class MonsterObject(DupeMixin, NameMixin):
     flag = 'e'
     flag_description = 'enemies'
+    randomselect_attributes = [
+        'hp', 'ap', 'pwr', 'dfn', 'agi', 'int',
+        ('steal_item_type', 'steal_item_index', 'steal_rate'),
+        ('drop_item_type', 'drop_item_index', 'drop_rate'),
+        'resistances']
+
+    mutate_attributes = {
+        'hp': (1, 65000),
+        'ap': None,
+        'pwr': None,
+        'dfn': None,
+        'agi': None,
+        'int': None,
+        'steal_rate': None,
+        'drop_rate': None,
+        }
+
+    RESISTANCES_NAMES = ['Fire', 'Frost', 'Thunder', 'Earth', 'Wind',
+                         'Holy', 'Psionic', 'Status', 'Death']
 
     def __repr__(self):
-        s = 'MONSTER {0:0>3X}{1} {2}\n'.format(
-            self.index, '*' if self.is_canonical else ' ', self.name)
-        for a in self.abilities:
-            if not a.name:
+        s = '{0:0>3X} LV{1:>3} {2}{3}\n'.format(
+            self.index, self.level, self.name,
+            '' if self.is_canonical else '*')
+        stats = ['hp', 'ap', 'pwr', 'dfn', 'agi', 'int']
+        s += ' - '.join('{0}:{1}'.format(
+            stat.upper(), getattr(self, stat)) for stat in stats) + '\n'
+        for i in range(3):
+            resistances_names = self.RESISTANCES_NAMES[(i*3):(i*3)+3]
+            resistances = self.resistances[(i*3):(i*3)+3]
+            s += ' | '.join('{0:7} {1}'.format(
+                a, b) for (a, b) in zip(resistances_names, resistances)) + '\n'
+        steal_rate = (2**self.steal_rate) / 128 if self.steal_rate else 0
+        steal_rate = int(round(steal_rate*100))
+        s += 'Steal: {0} {1}%\n'.format(
+            self.steal_item.name if self.steal_item else None, steal_rate)
+        drop_rate = (2**self.drop_rate) / 128 if self.drop_rate else 0
+        drop_rate = int(round(drop_rate*100))
+        s += 'Drop: {0} {1}%\n'.format(
+            self.drop_item.name if self.drop_item else None, drop_rate)
+        skills = []
+        for a in sorted(self.abilities, key=lambda x: x.name):
+            if a.name in ['Nothing', 'Noting'] or not a.name:
                 continue
-            s += ' - {0}\n'.format(a.name)
+            skills.append('{0}{1}'.format(
+                a.name, '*' if a.get_bit('examinable') else ''))
+        s += ', '.join(skills) + '\n'
         return s.strip()
 
     @property
@@ -1291,9 +1336,99 @@ class MonsterObject(DupeMixin, NameMixin):
 
     @property
     def intershuffle_valid(self):
-        return self.name and not self.is_boss
+        return self.name and self.is_canonical and not self.is_boss
+
+    def mutate_resistances(self):
+        elemental_resistances = self.resistances[:5]
+        status_resistances = self.resistances[-3:]
+        random.shuffle(elemental_resistances)
+        random.shuffle(status_resistances)
+        self.resistances[:5] = elemental_resistances
+        self.resistances[-3:] = status_resistances
+        self.resistances = [
+            mutate_normal(r, 0, 7, random_degree=self.random_degree)
+            for r in self.resistances]
+
+    @property
+    def steal_item(self):
+        if self.steal_rate == 0:
+            return None
+        item = ChestObject.get_item_by_type_index(self.steal_item_type,
+                                                  self.steal_item_index)
+        return item
+
+    @property
+    def drop_item(self):
+        if self.drop_rate == 0:
+            return None
+        item = ChestObject.get_item_by_type_index(self.drop_item_type,
+                                                  self.drop_item_index)
+        return item
+
+    def mutate_loot(self):
+        item = self.steal_item
+        if item is not None:
+            item = item.get_similar(random_degree=ChestObject.random_degree)
+            self.steal_item_type = ItemMixin.item_type_from_item(item)
+            self.steal_item_index = item.index
+
+        item = self.drop_item
+        if item is not None:
+            item = item.get_similar(random_degree=ChestObject.random_degree)
+            self.drop_item_type = ItemMixin.item_type_from_item(item)
+            self.drop_item_index = item.index
+
+    def mutate_skills(self):
+        if not self.intershuffle_valid:
+            return
+
+        ai_swap = self.get_similar()
+        self.initial_skills = list(getattr(ai_swap, 'initial_skills'))
+        for i in range(1, 5):
+            for attr in ['condition', 'ai_unknown', 'skills']:
+                attr = '%s%s' % (attr, i)
+                setattr(self, attr, getattr(ai_swap, attr))
+
+        existing_skills = set([])
+        for attr in ['initial_skills',
+                     'skills1', 'skills2', 'skills3', 'skills4']:
+            skills = [AbilityObject.get(s) for s in getattr(self, attr)]
+            existing_skills |= set(skills)
+
+        existing_skills = sorted(existing_skills, key=lambda s: s.index)
+        skill_map = {}
+        for existing in existing_skills:
+            if existing.rank < 0:
+                skill_map[existing.index] = existing.index
+                continue
+
+            candidates = [s for s in AbilityObject.ranked if s is s.examine_alt
+                          and existing.is_offense == s.is_offense
+                          and existing.is_utility == s.is_utility
+                          and s.rank >= 0]
+            new_skill = existing.examine_alt.get_similar(
+                candidates, random_degree=self.random_degree)
+            skill_map[existing.index] = new_skill.index
+
+        for attr in ['initial_skills',
+                     'skills1', 'skills2', 'skills3', 'skills4']:
+            skills = [skill_map[s] for s in getattr(self, attr)]
+            setattr(self, attr, skills)
+
+    def mutate(self):
+        super().mutate()
+        self.mutate_resistances()
+        self.mutate_loot()
+        self.reseed('skills')
+        if AbilityObject.flag in get_flags() and not self.is_boss:
+            self.mutate_skills()
 
     def cleanup(self):
+        if ChestObject.flag not in get_flags():
+            for attr in ['steal_item_index', 'steal_item_type', 'steal_rate',
+                         'drop_item_index', 'drop_item_type', 'drop_rate']:
+                setattr(self, attr, self.old_data[attr])
+
         if 'easymodo' in get_activated_codes():
             self.hp = min(self.old_data['hp'], 1)
 
