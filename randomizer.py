@@ -213,6 +213,9 @@ class ItemMixin(NameMixin):
                 c = random.choice(characters)
                 self.set_bit(c, True)
 
+        for attr in ['willpower', 'base_willpower', 'current_willpower']:
+            setattr(self, attr, 0)
+
     def cleanup(self):
         if hasattr(self, 'equipability'):
             if EquipmentObject.flag not in get_flags():
@@ -782,19 +785,13 @@ class BaseStatsObject(NameMixin):
     flag_description = 'characters'
     RESTRICTED_NAMES = ['Teepo', 'Whelp']
 
+    randomselect_attributes = [
+        'surprise_chance', 'reprisal_chance', 'critical_chance',
+        'evasion', 'accuracy']
+
     def __repr__(self):
         stats = ['hp', 'ap', 'pwr', 'dfn', 'agi', 'int']
         s = '{0:0>2X} {1}\n'.format(self.index, self.name)
-        '''
-        s += ' | '.join('{0:3}: {1:>2}'.format(
-            stat.upper(), self.old_data[stat]) for stat in stats)
-        s += '\n'
-        for l in self.levels:
-            if l.level <= self.level:
-                s += '{0}\n'.format(l)
-            else:
-                break
-        '''
         s += ' | '.join('{0:3}: {1:>2}'.format(
             stat.upper(), getattr(self, stat)) for stat in stats) + '\n'
         for l in self.levels:
@@ -931,6 +928,22 @@ class BaseStatsObject(NameMixin):
             else:
                 l.ability = 0
 
+    def randomize_resistances(self):
+        elemental_resistances = []
+        status_resistances = []
+        for bso in BaseStatsObject.every:
+            if not bso.intershuffle_valid:
+                continue
+            elemental_resistances += bso.resistances[:5]
+            status_resistances += bso.resistances[-3:]
+        resistances = (
+            [random.choice(elemental_resistances) for _ in range(5)] +
+            [5] + [random.choice(status_resistances) for _ in range(3)])
+        resistances = [mutate_normal(r, 0, 7, random_degree=self.random_degree)
+                       for r in resistances]
+        self.resistances = resistances
+        assert len(self.resistances) == len(self.old_data['resistances'])
+
     def mutate_stats(self):
         bases = [bso for bso in BaseStatsObject.every
                  if bso.name not in bso.RESTRICTED_NAMES]
@@ -952,6 +965,7 @@ class BaseStatsObject(NameMixin):
     def mutate(self):
         super().mutate()
         self.mutate_stats()
+        self.randomize_resistances()
         self.reseed('skills')
         if AbilityObject.flag in get_flags():
             self.mutate_skills()
