@@ -1,5 +1,5 @@
 item_name,12,str
-equipability,bit:ryu nina garr teepo rei momo peco unk
+equipability,bit:ryu nina garr teepo rei momo peco whelp
 unknown1,1,list
 equip_type,1
 weight,1

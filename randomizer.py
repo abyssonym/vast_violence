@@ -74,6 +74,14 @@ class ItemMixin(NameMixin):
     flag = 's'
     mutate_attributes = {'price': (1, 65000)}
 
+    @property
+    def magic_mutate_bit_attributes(self):
+        if (hasattr(self, 'equipability')
+                and EquipmentObject.flag in get_flags()
+                and not isinstance(self, WeaponObject)):
+            return {'equipability': 0x77}
+        return {}
+
     @classproperty
     def ITEM_TYPE_MAP(self):
         return {
@@ -161,7 +169,59 @@ class ItemMixin(NameMixin):
                                        random_degree=random_degree)
         return new_item
 
+    def magic_mutate_bits(self):
+        return
+
+    def mutate_equipability(self):
+        super().magic_mutate_bits()
+        names = {'ryu': 0x01,
+                 'nina': 0x02,
+                 'garr': 0x04,
+                 'rei': 0x10,
+                 'momo': 0x20,
+                 'peco': 0x40}
+        sorted_names = sorted(names)
+        if not hasattr(type(self), '_equipment_map'):
+            if isinstance(self, WeaponObject):
+                shuffled_names = list(sorted_names)
+                random.shuffle(shuffled_names)
+                equipment_map = dict(zip(sorted_names, shuffled_names))
+            else:
+                equipment_map = {}
+                for n in sorted_names:
+                    equipment_map[n] = random.choice(sorted_names)
+            type(self)._equipment_map = equipment_map
+
+        value = self.equipability
+        for n in sorted_names:
+            mapped_from = type(self)._equipment_map[n]
+            bitmask = names[mapped_from]
+            truth = value & bitmask
+            self.set_bit(n, truth)
+        self.set_bit('teepo', True)
+
+    def mutate(self):
+        super().mutate()
+        if (hasattr(self, 'equipability')
+                and EquipmentObject.flag in get_flags()):
+            self.mutate_equipability()
+
+    def preclean(self):
+        if hasattr(self, 'equipability') and self.old_data['equipability'] > 0:
+            characters = ['ryu', 'nina', 'garr', 'rei', 'momo', 'peco']
+            if not any(self.get_bit(c) for c in characters):
+                c = random.choice(characters)
+                self.set_bit(c, True)
+
     def cleanup(self):
+        if hasattr(self, 'equipability'):
+            if EquipmentObject.flag not in get_flags():
+                assert self.equipability == self.old_data['equipability']
+            if self.old_data['equipability'] == 0:
+                self.equipability = 0
+            elif 'equipanything' in get_activated_codes():
+                self.equipability = 0xff
+
         if self.price >= 100:
             self.price = int(float('%.2g' % (self.price*2)) / 2)
         else:
@@ -192,6 +252,11 @@ class DupeMixin:
         if self.canonical_relative is not self:
             for attr in self.old_data:
                 setattr(self, attr, getattr(self.canonical_relative, attr))
+
+
+class EquipmentObject(TableObject):
+    flag = 'q'
+    flag_description = 'equippable items'
 
 
 class FairyGiftObject(AcquireItemMixin): pass
@@ -892,36 +957,40 @@ class BaseStatsObject(NameMixin):
             self.mutate_skills()
 
     def cleanup(self):
-        for ability_type in ['healing', 'assist', 'attack', 'skills']:
-            setattr(self, '%s_abilities' % ability_type, list([]))
+        if self.flag in get_flags():
+            for ability_type in ['healing', 'assist', 'attack', 'skills']:
+                setattr(self, '%s_abilities' % ability_type, list([]))
 
-        for l in self.levels:
-            if l.ability > 0:
-                skill = AbilityObject.get(l.ability)
-                skill_type = skill.skill_type & 3
-                if self.name not in self.RESTRICTED_NAMES:
-                    assert not skill.get_bit('examinable')
-                    assert skill_type != AbilityObject.EXAMINE_SKILL
+            for l in self.levels:
+                if l.ability > 0:
+                    skill = AbilityObject.get(l.ability)
+                    skill_type = skill.skill_type & 3
+                    if self.name not in self.RESTRICTED_NAMES:
+                        assert not skill.get_bit('examinable')
+                        assert skill_type != AbilityObject.EXAMINE_SKILL
 
-                if l.level <= self.level:
-                    if skill_type == AbilityObject.HEALING_SKILL:
-                        self.healing_abilities.append(skill.index)
-                    elif skill_type == AbilityObject.ASSIST_SKILL:
-                        self.assist_abilities.append(skill.index)
-                    elif skill_type == AbilityObject.ATTACK_SKILL:
-                        self.attack_abilities.append(skill.index)
-                    elif skill_type == AbilityObject.EXAMINE_SKILL:
-                        self.skills_abilities.append(skill.index)
+                    if l.level <= self.level:
+                        if skill_type == AbilityObject.HEALING_SKILL:
+                            self.healing_abilities.append(skill.index)
+                        elif skill_type == AbilityObject.ASSIST_SKILL:
+                            self.assist_abilities.append(skill.index)
+                        elif skill_type == AbilityObject.ATTACK_SKILL:
+                            self.attack_abilities.append(skill.index)
+                        elif skill_type == AbilityObject.EXAMINE_SKILL:
+                            self.skills_abilities.append(skill.index)
 
-        for ability_type in ['healing', 'assist', 'attack', 'skills']:
-            attr = '%s_abilities' % ability_type
-            assert all(a for a in getattr(self, attr))
-            assert len(set(getattr(self, attr))) == len(getattr(self, attr))
-            while len(getattr(self, attr)) < len(self.old_data[attr]):
-                getattr(self, attr).append(0)
-            assert len(getattr(self, attr)) == len(self.old_data[attr])
+            for ability_type in ['healing', 'assist', 'attack', 'skills']:
+                attr = '%s_abilities' % ability_type
+                values = getattr(self, attr)
+                assert all(a for a in values)
+                assert len(set(values)) == len(values)
+                while len(getattr(self, attr)) < len(self.old_data[attr]):
+                    getattr(self, attr).append(0)
+                assert len(getattr(self, attr)) == len(self.old_data[attr])
 
         for attr in sorted(self.old_data):
+            if self.flag not in get_flags():
+                assert getattr(self, attr) == self.old_data[attr]
             other_attrs = ['base_%s' % attr, 'current_%s' % attr]
             for other in other_attrs:
                 if other in self.old_data:
@@ -1229,6 +1298,7 @@ if __name__ == '__main__':
                        and g not in [TableObject]]
         codes = {
             'easymodo': ['easymodo'],
+            'equipanything': ['equipanything'],
             }
         run_interface(ALL_OBJECTS, snes=False, codes=codes,
                       custom_degree=True)
