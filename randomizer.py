@@ -1068,6 +1068,22 @@ class BaseStatsObject(NameMixin):
         if self.name == 'Whelp':
             self.attack_abilities = self.old_data['attack_abilities']
 
+        if self.name == 'Ryu':
+            for l in LevelObject.every:
+                if l.ability > 0:
+                    skill = AbilityObject.get(l.ability)
+                    if skill.name == 'Pilfer' or skill.name == 'Steal':
+                        break
+            else:
+                pilfer = [a for a in AbilityObject.every
+                          if a is a.examine_alt and a.name == 'Pilfer'][0]
+                pilfer.set_bit('examinable', True)
+                pilfer.reset_skill_type(AbilityObject.EXAMINE_SKILL)
+                self.skills_abilities.remove(0)
+                self.skills_abilities.insert(0, pilfer.index)
+                assert (len(self.skills_abilities) ==
+                        len(self.old_data['skills_abilities']))
+
         if 'easymodo' in get_activated_codes() or self.name == 'Whelp':
             self.accuracy = 100
             self.base_accuracy = 100
