@@ -985,7 +985,7 @@ class BaseStatsObject(NameMixin):
 
     def cleanup(self):
         weapon = WeaponObject.get(self.weapon)
-        if not weapon.get_bit(self.name.lower()):
+        if not weapon.get_bit(self.name.lower()) and weapon.name != 'Nothing':
             candidates = [w for w in WeaponObject.ranked if
                           w.get_bit(self.name.lower())]
             temp = [c for c in candidates
@@ -1222,6 +1222,8 @@ class MonsterObject(DupeMixin, NameMixin):
     flag = 'e'
     flag_description = 'enemies'
     custom_random_enable = 'e'
+    custom_difficulty_enable = False
+    difficulty_attrs = ['hp', 'ap', 'pwr', 'dfn', 'agi', 'int']
     randomselect_attributes = [
         'hp', 'ap', 'pwr', 'dfn', 'agi', 'int',
         ('steal_item_type', 'steal_item_index', 'steal_rate'),
@@ -1432,7 +1434,59 @@ class MonsterObject(DupeMixin, NameMixin):
         if AbilityObject.flag in get_flags() and not self.is_boss:
             self.mutate_skills()
 
+    def difficulty_boost(self):
+        if self.random_difficulty == 1.0:
+            return
+
+        monsters = [m for m in MonsterObject.ranked
+                    if m.is_canonical and m.rank >= 0]
+        if self not in monsters:
+            return
+
+        if self.random_difficulty > 1.0:
+            difficulty = self.random_difficulty - 1
+            index = monsters.index(self)
+            ranked_ratio = index / (len(monsters)-1)
+            difficulty = (difficulty * ranked_ratio) + 1
+        else:
+            difficulty = self.random_difficulty
+
+        for diffattr in self.difficulty_attrs:
+            value = getattr(self, diffattr)
+            value = int(round(value * random.uniform(1.0, difficulty)))
+            if diffattr == 'hp':
+                value2 = int(round(value * random.uniform(1.0, difficulty)))
+                value = max(value, value2)
+
+            length = [l for (attr, l, _) in self.specsattrs
+                      if attr == diffattr][0]
+            assert 1 <= length <= 2
+            if length == 1:
+                value = min(value, max(0xFE, self.old_data[diffattr]))
+            elif length == 2:
+                value = min(value, max(0xFFFE, self.old_data[diffattr]))
+
+            setattr(self, diffattr, value)
+
+        new_resistances = []
+        for r in self.resistances:
+            assert 0 <= r <= 7
+            r = int(round(r * random.uniform(1.0, difficulty)))
+            r = max(0, min(r, 7))
+            new_resistances.append(r)
+        self.resistances = new_resistances
+
+    def preclean(self):
+        self.reseed('difficulty')
+        self.difficulty_boost()
+
     def cleanup(self):
+        if self.is_boss and self.random_difficulty >= 1.0:
+            for attr in self.difficulty_attrs:
+                value = getattr(self, attr)
+                value = max(value, self.old_data[attr])
+                setattr(self, attr, value)
+
         if ChestObject.flag not in get_flags():
             for attr in ['steal_item_index', 'steal_item_type', 'steal_rate',
                          'drop_item_index', 'drop_item_type', 'drop_rate']:
@@ -1480,7 +1534,7 @@ if __name__ == '__main__':
             'equipanything': ['equipanything'],
             }
         run_interface(ALL_OBJECTS, snes=False, codes=codes,
-                      custom_degree=True)
+                      custom_degree=True, custom_difficulty=True)
 
         write_seed_number()
         clean_and_write(ALL_OBJECTS)
