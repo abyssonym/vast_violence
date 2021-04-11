@@ -14,15 +14,15 @@ ShopObject          struct_shop.txt             3528c@BIN/ETC/GAME.EMI      40
 MasterSkillsObject  struct_master_skills.txt    03c88@BIN/ETC/SISYOU.EMI    17
 MasterStatsObject   struct_master_stats.txt     03d54@BIN/ETC/SISYOU.EMI    17
 BaseStatsObject     struct_base_stats.txt       72914@BIN/ETC/START.EMI     8
-ChestObject         struct_chest.txt            pointers_chests_1.1.txt
+ChestObject         struct_chest.txt            pointers_chests_1.0.txt
 GeneObject          struct_gene.txt             pointers_genes.txt
-FormationObject     struct_formation.txt        pointers_formations_1.1.txt
-ManilloItemObject   struct_manillo_item.txt     pointers_manillo_items_1.1.txt
-MonsterObject       struct_monster.txt          pointers_monsters_1.1.txt
+FormationObject     struct_formation.txt        pointers_formations_1.0.txt
+ManilloItemObject   struct_manillo_item.txt     pointers_manillo_items_1.0.txt
+MonsterObject       struct_monster.txt          pointers_monsters_1.0.txt
 .patch              patch_flame_gene.txt
-$seed1a             1571
-$seed1b             3c571
+$seed1a             156b
+$seed1b             3c56b
 $seed1len           14
-$seed2a             1598
-$seed2b             3c598
+$seed2a             1592
+$seed2b             3c592
 $seed2len           c

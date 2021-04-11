@@ -1,0 +1,377 @@
+# Area 000
+caa7c@BIN/WORLD00/AREA000.EMI  # Vitamin
+
+# Cedar Woods, Spring, Your house area
+abc89@BIN/WORLD00/AREA005.EMI  # Skill Ink
+abc96@BIN/WORLD00/AREA005.EMI  # Ammonia
+
+# Cedar Woods, Spring, Where Ryu was found
+c2068@BIN/WORLD00/AREA006.EMI  # Green Apple
+c2075@BIN/WORLD00/AREA006.EMI  # Green Apple
+
+# Area 007
+b3565@BIN/WORLD00/AREA007.EMI  # Vitamin
+b361f@BIN/WORLD00/AREA007.EMI  # Vitamin
+
+# Cedar Woods, Pre-Nue, Where Ryu was found
+ba14e@BIN/WORLD00/AREA009.EMI  # Green Apple
+ba15b@BIN/WORLD00/AREA009.EMI  # Green Apple
+
+# Cedar Woods, Pre-Nue, Your house area
+c4b7c@BIN/WORLD00/AREA010.EMI  # Skill Ink
+c4b89@BIN/WORLD00/AREA010.EMI  # Ammonia
+
+# Cedar Woods, Your house, Balio & Sunder event
+bb1f6@BIN/WORLD00/AREA011.EMI  # Skill Ink
+bb203@BIN/WORLD00/AREA011.EMI  # Ammonia
+
+# Cedar Woods, Post Balio & Sunder, Your house area
+b112d@BIN/WORLD00/AREA012.EMI  # Skill Ink
+b113a@BIN/WORLD00/AREA012.EMI  # Ammonia
+
+# Yraall Road, Spring
+c3268@BIN/WORLD00/AREA018.EMI  # 40Z
+
+# Yraall Road, Pre-Nue
+9d215@BIN/WORLD00/AREA019.EMI  # 40Z
+
+# Yraall Region Random Battlefield, Spring
+c0954@BIN/WORLD00/AREA020.EMI  # Worm
+c0961@BIN/WORLD00/AREA020.EMI  # Antidote
+c096e@BIN/WORLD00/AREA020.EMI  # Old Popper
+c097b@BIN/WORLD00/AREA020.EMI  # Molotov
+c0988@BIN/WORLD00/AREA020.EMI  # Bandana
+c0995@BIN/WORLD00/AREA020.EMI  # Bracers
+c09a2@BIN/WORLD00/AREA020.EMI  # Vitamin
+c09af@BIN/WORLD00/AREA020.EMI  # Float
+
+# Area 021
+c04c7@BIN/WORLD00/AREA021.EMI  # Old Painting
+
+# Mt. Glaus, Nue's Cave
+ceb37@BIN/WORLD00/AREA022.EMI  # BallockKnife
+ceb44@BIN/WORLD00/AREA022.EMI  # Talisman
+ceb54@BIN/WORLD00/AREA022.EMI  # 200Z
+ceb64@BIN/WORLD00/AREA022.EMI  # Molotov
+
+# Mt. Glaus, Outside
+d32f9@BIN/WORLD00/AREA023.EMI  # Antidote
+d3306@BIN/WORLD00/AREA023.EMI  # Heavy Caro
+d3313@BIN/WORLD00/AREA023.EMI  # Vitamins
+d3320@BIN/WORLD00/AREA023.EMI  # Cloth Shield
+
+# Mcneil Manor, Roof
+cd228@BIN/WORLD00/AREA028.EMI  # Swallow Eye
+cd235@BIN/WORLD00/AREA028.EMI  # Broad Sword
+
+# Yraall Region Random Battlefield, Pre-Nue
+c3154@BIN/WORLD00/AREA029.EMI  # Healing Herb
+c3161@BIN/WORLD00/AREA029.EMI  # Antidote
+c316e@BIN/WORLD00/AREA029.EMI  # Sinker
+c317b@BIN/WORLD00/AREA029.EMI  # Molotov
+c3188@BIN/WORLD00/AREA029.EMI  # Bandana
+c3195@BIN/WORLD00/AREA029.EMI  # Bracers
+c31a2@BIN/WORLD00/AREA029.EMI  # Vitamin
+c31af@BIN/WORLD00/AREA029.EMI  # Popper
+
+# Area 034
+a1a89@BIN/WORLD00/AREA034.EMI  # Life Shard
+a1a96@BIN/WORLD00/AREA034.EMI  # Magic Shard
+a1aa3@BIN/WORLD00/AREA034.EMI  # Vitamin
+
+# Ogre Road
+ae9f6@BIN/WORLD00/AREA035.EMI  # Hourglass
+
+# Momo's Tower, Early floors
+c42bd@BIN/WORLD01/AREA040.EMI  # Skill Ink
+c42ca@BIN/WORLD01/AREA040.EMI  # Flame Chrysm
+c42d7@BIN/WORLD01/AREA040.EMI  # Ice Chrysm
+
+# Wyndia Castle Basement
+ca137@BIN/WORLD01/AREA041.EMI  # Skill Ink
+ca144@BIN/WORLD01/AREA041.EMI  # Laurel
+
+# Momo's Tower, Outside, Entrance, and Chrysm Puzzle room
+c2984@BIN/WORLD01/AREA042.EMI  # Silver Knife
+
+# Checkpoint, Mikba fight
+b95eb@BIN/WORLD01/AREA043.EMI  # Deluxe Rod
+
+# Momo's Tower, Middle floors
+cdeaf@BIN/WORLD01/AREA044.EMI  # Moon Tears
+cdebf@BIN/WORLD01/AREA044.EMI  # 800Z
+
+# Area 047
+baeac@BIN/WORLD01/AREA047.EMI  # Ginseng
+
+# Momo's Tower, Topmost floors
+cf40a@BIN/WORLD01/AREA048.EMI  # Breastplate
+cf417@BIN/WORLD01/AREA048.EMI  # Ivory Dice
+cf477@BIN/WORLD01/AREA048.EMI  # Bamboo Rod
+
+# Mt. Myrneg
+b2ab9@BIN/WORLD01/AREA051.EMI  # 200Z
+b2ac6@BIN/WORLD01/AREA051.EMI  # Protein
+b2ad3@BIN/WORLD01/AREA051.EMI  # Bat Amulet
+b2ae0@BIN/WORLD01/AREA051.EMI  # Icicle
+
+# The Dump
+c8224@BIN/WORLD01/AREA052.EMI  # 1200Z
+c8231@BIN/WORLD01/AREA052.EMI  # High Boots
+c8279@BIN/WORLD01/AREA052.EMI  # Artemis' Cap
+c8286@BIN/WORLD01/AREA052.EMI  # Magic Shard
+
+# Wyndian Catacombs
+cab20@BIN/WORLD01/AREA056.EMI  # Panacea
+cab2d@BIN/WORLD01/AREA056.EMI  # Glass Domino
+cab3a@BIN/WORLD01/AREA056.EMI  # Light Bangle
+cab47@BIN/WORLD01/AREA056.EMI  # Wisdom Fruit
+
+# Area 058
+ca301@BIN/WORLD01/AREA058.EMI  # Tea Cup
+
+# Eastern Wyndia Region Random Battlefield
+c4954@BIN/WORLD01/AREA064.EMI  # Healing Herb
+c4961@BIN/WORLD01/AREA064.EMI  # Antidote
+c496e@BIN/WORLD01/AREA064.EMI  # Popper
+c497b@BIN/WORLD01/AREA064.EMI  # Baby Frog
+c4988@BIN/WORLD01/AREA064.EMI  # 80Z
+c4995@BIN/WORLD01/AREA064.EMI  # Panacea
+c49a2@BIN/WORLD01/AREA064.EMI  # Life Shard
+c49af@BIN/WORLD01/AREA064.EMI  # Magic Shard
+
+# Mt. Levett
+ca084@BIN/WORLD01/AREA070.EMI  # 800Z
+ca091@BIN/WORLD01/AREA070.EMI  # Gold Hairpin
+
+# Mt. Boumore, Back
+ca9ce@BIN/WORLD01/AREA071.EMI  # Life Shard
+
+# Rhapala Region Random Battlefield
+c3954@BIN/WORLD01/AREA072.EMI  # Spirit
+c3961@BIN/WORLD01/AREA072.EMI  # Popper
+c396e@BIN/WORLD01/AREA072.EMI  # Vitamin
+c397b@BIN/WORLD01/AREA072.EMI  # Panacea
+c3988@BIN/WORLD01/AREA072.EMI  # Ammonia
+c3995@BIN/WORLD01/AREA072.EMI  # Wisdom Seed
+c39a2@BIN/WORLD01/AREA072.EMI  # Life Shard
+c39af@BIN/WORLD01/AREA072.EMI  # Magic Shard
+
+# Urkan Region Random Battlefield
+c8954@BIN/WORLD01/AREA073.EMI  # Float
+c8961@BIN/WORLD01/AREA073.EMI  # Baby Frog
+c896e@BIN/WORLD01/AREA073.EMI  # Vitamin
+c897b@BIN/WORLD01/AREA073.EMI  # Panacea
+c8988@BIN/WORLD01/AREA073.EMI  # Ammonia
+c8995@BIN/WORLD01/AREA073.EMI  # Wisdom Seed
+c89a2@BIN/WORLD01/AREA073.EMI  # Life Shard
+c89af@BIN/WORLD01/AREA073.EMI  # Magic Shard
+
+# Lighthouse, Outside
+c788b@BIN/WORLD02/AREA076.EMI  # Swallow Eye
+c7898@BIN/WORLD02/AREA076.EMI  # MithrlShield
+c78a5@BIN/WORLD02/AREA076.EMI  # Coin
+
+# Angel Tower, Outside
+d4e0a@BIN/WORLD02/AREA082.EMI  # Wisdom Seed
+d4e17@BIN/WORLD02/AREA082.EMI  # Ivory Dice
+
+# Angel Tower, Early floors
+d1869@BIN/WORLD02/AREA083.EMI  # Napalm
+d1876@BIN/WORLD02/AREA083.EMI  # Skill Ink
+d1883@BIN/WORLD02/AREA083.EMI  # Soul Gem
+
+# Angel Tower, Deeper floors
+cf938@BIN/WORLD02/AREA084.EMI  # Mithril Helm
+cf945@BIN/WORLD02/AREA084.EMI  # Moon Tears
+cf952@BIN/WORLD02/AREA084.EMI  # Diamond Ring
+
+# Steel Beach, Freighter
+9e614@BIN/WORLD02/AREA086.EMI  # Robe of Wind
+
+# ? Area Where Meryleep is found
+aae54@BIN/WORLD02/AREA091.EMI  # Protein
+aae61@BIN/WORLD02/AREA091.EMI  # 800Z
+aae6e@BIN/WORLD02/AREA091.EMI  # Scramasax
+
+# ? Area Before Mt. Glaus, Spring
+afba6@BIN/WORLD02/AREA095.EMI  # Weather Vane
+afbb3@BIN/WORLD02/AREA095.EMI  # 80Z
+
+# ? Area Before Mt. Glaus, Pre-Nue
+afb1b@BIN/WORLD02/AREA096.EMI  # Weather Vane
+afb28@BIN/WORLD02/AREA096.EMI  # 80Z
+
+# Area 097
+c41bd@BIN/WORLD02/AREA097.EMI  # Protein
+
+# Mt Boumore, Front
+d0eda@BIN/WORLD02/AREA099.EMI  # Panacea
+d0ee7@BIN/WORLD02/AREA099.EMI  # Buckler
+d0ef4@BIN/WORLD02/AREA099.EMI  # 400Z
+
+# Mt. Zublo, Early areas
+a0668@BIN/WORLD02/AREA102.EMI  # AsbestosArmr
+a0675@BIN/WORLD02/AREA102.EMI  # 800Z
+a0682@BIN/WORLD02/AREA102.EMI  # Ring of Fire
+
+# Mt. Zublo, Later areas
+ccee7@BIN/WORLD02/AREA103.EMI  # Flame Talons
+ccef4@BIN/WORLD02/AREA103.EMI  # Life Shard
+ccf01@BIN/WORLD02/AREA103.EMI  # Wisdom Fruit
+
+# Area 104
+c75e4@BIN/WORLD02/AREA104.EMI  # Heavy Dagger
+c75f1@BIN/WORLD02/AREA104.EMI  # BlizzardMail
+c75fe@BIN/WORLD02/AREA104.EMI  # Ice Shield
+
+# Tidal Caves, Outside
+c07b8@BIN/WORLD02/AREA105.EMI  # Deadly Blade
+
+# Tidal Caves, Inside, Where tide cannot change
+c0c2c@BIN/WORLD02/AREA106.EMI  # Coin
+c0c39@BIN/WORLD02/AREA106.EMI  # Thunder Ring
+
+# Tidal Caves, Inside, Where tide can change
+bc2ab@BIN/WORLD02/AREA107.EMI  # Fish=head
+bc2b8@BIN/WORLD02/AREA107.EMI  # Hawk's Ring
+
+# Dauna Hills Region Random Battlefield
+bf154@BIN/WORLD02/AREA110.EMI  # Frog
+bf161@BIN/WORLD02/AREA110.EMI  # Antidote
+bf16e@BIN/WORLD02/AREA110.EMI  # Vitamin
+bf17b@BIN/WORLD02/AREA110.EMI  # MultiVitamin
+bf188@BIN/WORLD02/AREA110.EMI  # Firecracker
+bf195@BIN/WORLD02/AREA110.EMI  # Icicle
+bf1a2@BIN/WORLD02/AREA110.EMI  # Power Food
+bf1af@BIN/WORLD02/AREA110.EMI  # Protein
+
+# Colony, Portal room to Jack room
+ccde9@BIN/WORLD02/AREA111.EMI  # 4000Z
+ccdf6@BIN/WORLD02/AREA111.EMI  # Barbarossa
+cce03@BIN/WORLD02/AREA111.EMI  # Skill Ink
+cce10@BIN/WORLD02/AREA111.EMI  # LaquerShield
+
+# Colony, Platform room and above
+c4ab0@BIN/WORLD02/AREA112.EMI  # Hourglass
+c4abd@BIN/WORLD02/AREA112.EMI  # LacquerStaff
+
+# Underground Laboratory, Entrance, First few rooms
+ab3cd@BIN/WORLD03/AREA117.EMI  # Skill Ink
+ab3da@BIN/WORLD03/AREA117.EMI  # Sleep Shells
+
+# Underground Laboratory, Boss areas
+d32e5@BIN/WORLD03/AREA119.EMI  # Wisdom Ring
+
+# Lost Shore Region Random Battlefield
+c2160@BIN/WORLD03/AREA124.EMI  # Top
+c216d@BIN/WORLD03/AREA124.EMI  # Antidote
+c217a@BIN/WORLD03/AREA124.EMI  # Vitamin
+c2187@BIN/WORLD03/AREA124.EMI  # MultiVitamin
+c2194@BIN/WORLD03/AREA124.EMI  # Power Food
+c21a1@BIN/WORLD03/AREA124.EMI  # Protein
+c21ae@BIN/WORLD03/AREA124.EMI  # Ginseng
+c21bb@BIN/WORLD03/AREA124.EMI  # Ivory Dice
+
+# Desert of Death/Desert Region Random Battlefield
+c1308@BIN/WORLD03/AREA125.EMI  # Healing Herb
+c1315@BIN/WORLD03/AREA125.EMI  # Antidote
+c1322@BIN/WORLD03/AREA125.EMI  # MultiVitamin
+c132f@BIN/WORLD03/AREA125.EMI  # Wisdom Seed
+c133c@BIN/WORLD03/AREA125.EMI  # Swallow Eye
+c1349@BIN/WORLD03/AREA125.EMI  # Fish=head
+c1356@BIN/WORLD03/AREA125.EMI  # Moon Tears
+c1363@BIN/WORLD03/AREA125.EMI  # Ivory Dice
+c1373@BIN/WORLD03/AREA125.EMI  # Death Claws
+c1384@BIN/WORLD03/AREA125.EMI  # Moon Tears
+c1395@BIN/WORLD03/AREA125.EMI  # Life Armor
+c13a6@BIN/WORLD03/AREA125.EMI  # Royal Sword
+c13b7@BIN/WORLD03/AREA125.EMI  # Speed Boots
+c13c8@BIN/WORLD03/AREA125.EMI  # Moon Tears
+
+# Steel Grave
+cc0dd@BIN/WORLD03/AREA127.EMI  # Spanner
+
+# Black Ship, Early areas
+d677c@BIN/WORLD03/AREA135.EMI  # Wisdom Fruit
+d6789@BIN/WORLD03/AREA135.EMI  # Light Bangle
+d6796@BIN/WORLD03/AREA135.EMI  # Ascension
+d67a3@BIN/WORLD03/AREA135.EMI  # Protectors
+
+# Black Ship, Boost counter part
+cfa35@BIN/WORLD03/AREA136.EMI  # 2400Z
+
+# Factory, Outside
+b0830@BIN/WORLD03/AREA138.EMI  # Wisdom Seed
+b083d@BIN/WORLD03/AREA138.EMI  # Artemis' Cap
+b084a@BIN/WORLD03/AREA138.EMI  # Skill Ink
+b0857@BIN/WORLD03/AREA138.EMI  # Fish=head
+
+# Factory, Early areas
+b416d@BIN/WORLD03/AREA139.EMI  # Ammonia
+b4187@BIN/WORLD03/AREA139.EMI  # Aries Spear
+
+# Factory, Later areas
+b6562@BIN/WORLD03/AREA140.EMI  # Sage's Frock
+b656f@BIN/WORLD03/AREA140.EMI  # Homing Bomb
+
+# Colony, Outside
+cc9d6@BIN/WORLD03/AREA145.EMI  # Deep Diver
+
+# Area 157
+98026@BIN/WORLD04/AREA157.EMI  # Hourglass
+
+# Sample Boss Rooms, Dodo
+940a3@BIN/WORLD04/AREA161.EMI  # Swallow Eye
+
+# Sample Boss Rooms, Manmo
+9108c@BIN/WORLD04/AREA163.EMI  # Moon Tears
+
+# Sample Boss Rooms, Stallion
+9349c@BIN/WORLD04/AREA166.EMI  # Cupid's Lyre
+
+# Myria Station, Worker's Area
+d0887@BIN/WORLD04/AREA167.EMI  # Life Shard
+d0894@BIN/WORLD04/AREA167.EMI  # Wisdom Fruit
+
+# Myria Station, Main Hall
+ba2cc@BIN/WORLD04/AREA168.EMI  # Demonsbane
+ba2d9@BIN/WORLD04/AREA168.EMI  # Light Bangle
+
+# Myria Station, Laboratory, Near resting spot
+a1740@BIN/WORLD04/AREA169.EMI  # Holy Robe
+a174d@BIN/WORLD04/AREA169.EMI  # 10000Z
+
+# Myria Station, Laboratory, Near HE Shells and shock panel rooms
+cd06a@BIN/WORLD04/AREA170.EMI  # Skill Ink
+cd077@BIN/WORLD04/AREA170.EMI  # Slicer
+cd084@BIN/WORLD04/AREA170.EMI  # GiantShield
+cd091@BIN/WORLD04/AREA170.EMI  # Dragon Helm
+cd09e@BIN/WORLD04/AREA170.EMI  # DragonShield
+cd0ab@BIN/WORLD04/AREA170.EMI  # Ivory Dice
+
+# Myria Station, Path to Eden
+ab4b8@BIN/WORLD04/AREA171.EMI  # Protein
+ab4c5@BIN/WORLD04/AREA171.EMI  # Magic Shard
+ab4d2@BIN/WORLD04/AREA171.EMI  # Silver Tiara
+ab4df@BIN/WORLD04/AREA171.EMI  # Dragon Spear
+
+# Myria Station, Eden
+c0e5b@BIN/WORLD04/AREA172.EMI  # Force Armor
+c0e68@BIN/WORLD04/AREA172.EMI  # Soul Gem
+
+# Black Ship, Rest area
+cc111@BIN/WORLD04/AREA188.EMI  # 2400Z
+
+# Area 195
+c40e7@BIN/WORLD04/AREA195.EMI  # Protein
+
+# Central Wyndia Region Random Battlefield (v1.1 only)
+c1154@BIN/WORLD01/AREA063.EMI  # Sinker
+c1161@BIN/WORLD01/AREA063.EMI  # Antidote
+c116e@BIN/WORLD01/AREA063.EMI  # Eye Drops
+c117b@BIN/WORLD01/AREA063.EMI  # Vitamin
+c1188@BIN/WORLD01/AREA063.EMI  # Spirit
+c1195@BIN/WORLD01/AREA063.EMI  # 80Z
+c11a2@BIN/WORLD01/AREA063.EMI  # Panacea
+c11af@BIN/WORLD01/AREA063.EMI  # Life Shard
