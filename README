@@ -1,0 +1,38 @@
+Breath of Fire 3 "The Vast and the Violent" Randomizer
+Version:    1
+Date:       April 11, 2021
+URL:        https://www.abyssonym.com/
+            https://www.github.com/abyssonym
+Contact:    https://twitter.com/abyssonym
+
+--- HOW TO USE ---
+    Running the randomizer:
+        Windows users may use the executable file, "bof3_vast_violence.exe". Other users, please run "randomizer.py" using Python version 3.8+.
+
+    Compatible with the following roms for the original Playstation:
+        BOF3_1.0    "Vodka Shot"    226771993e29ca5c8e6e2c094c40e8d2
+        BOF3_1.1    "Ginseng"       9dd9a7c934b8b59d0ce76b0f25d18176
+
+    This randomizer has the following flags:
+        a  Randomize abilities.
+        c  Randomize characters.
+        e  Randomize enemies.
+        g  Randomize dragon gene locations.
+        m  Randomize masters.
+        q  Randomize equippable items.
+        s  Randomize shops and trades.
+        t  Randomize treasure.
+
+    Additionally, the level of randomness can be adjusted to your preference. A value of 0 changes virtually nothing, a value of 1 is extremely unbalanced (i.e., final boss stats on goblins), and 0.5 is the recommended, default setting.
+    Even more additionally, you can also set a custom difficulty multiplier. This multiplier only affects enemy stats and affects them randomly, and the multiplier scales with enemy level, so the effect is greater the further you get into the game. 1.0 is the default and represents no boost, 2.0 means that the highest level enemies could potentially double all of their stats, etc.
+
+    The randomizer has the following secret codes:
+        bluemagician        Make all skills (except levelup skills) examinable.
+        equipanything       Make all characters able to equip any weapon or armor.
+        thinkwell           Put a fountain pen in the chest near Rei's and Teepo's house.
+        feyday              Custom rename the fairies in your village.
+            (You will need to input the name of a text file, with each new fairy name on a separate line.
+             The character limit is 5, and there are 60 fairies total,
+             so good luck coming up with that many short names.)
+
+    If you have any questions, comments, or bug reports, please do not hesitate to contact me. I might not be able to get back to you right away, but it is nice to have messages to reference when I do get the time to revisit a project.

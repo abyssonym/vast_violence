@@ -1,0 +1,28 @@
+Here is a short list of features I have not implemented yet, with some notes on potential difficulties in implementing them.
+
+RANDOMIZED SHELF & CABINET ITEMS
+    These items use a different event pattern than chests, and there's enough variation that I wasn't able to figure it out. Since these items are mostly low-value consumables, I decided it wasn't worth the effort.
+
+RANDOMIZED ENEMY FORMATIONS
+    I haven't messed with formations at all, but the data structures are pretty well comprehended. I just don't know about potential graphical memory limitations or what safeguards, if any, the game has to prevent shooting myself in the foot.
+    Part 2: Including enemies in an area where they don't normally appear. Each area can spawn up to 7 different enemies and there are plenty of empty slots, but again, I don't know what the limitations are.
+
+NEW ENEMIES / MULTIPLE VARIANTS
+    Each map stores a copy of the enemy data that it uses, which means that each map could potentially have its own unique enemies. I decided against this to reduce complexity, for both the player and myself. I think this feature should also require randomized palettes & names to signal to the player that the monsters are different.
+
+INFINITY GENE LOCATION
+    This is not actually that difficult, and probably requires a simple ASM hack similar to some of the other genes, but this gene is acquired so late in the game (i.e. difficult to test), and requires so much AP, that I decided that including it in the randomization pool was not a priority.
+
+FAERIE VILLAGE SPEEDUP
+    This would require some ASM reverse engineering. Presumably there's an address or seven in memory that acts a battle counter, so you would want to monitor those and set a break point when you enter the village. I don't know if this will be helpful, but whenever you enter a new map the event scripts are loaded at 801f2c00, and faerie village are in the COMMU files and AREA 175-185.
+    By the way, events are multi-threaded! So don't bother trying to follow the control logic from the scripts themselves. Just use NO$PSX and set breakpoints instead.
+
+FISHING FISH
+    This might not be too bad? We know where the Manillo shops are (AREA 030, 089, 129) and we know the item indexes of all the fish items. Might be able to find them with some kind of dragnet search. A bit more difficult than shooting fish in a barrel.
+
+DRAGON FORM STATS AND SKILLS
+    The location of the skills might not be too difficult to find, I believe they have been found before but that documentation is now lost. Stats might be tougher because they're multipliers, but that data is probably in the battle engine (of which there exists a copy in each of the boss files, incidentally) and you can maybe find it with breakpoints. A problem with the skills is that some skills expect you to be dragon form or not, and cause bugs when you use them out of context. So it may not be worth the effort. I kept the dragons vanilla under the rationale that randomized genes was interesting enough
+    AP Costs are also pretty easy to find, $a847c in BATTLE.EMI, but of course there are many copies in each of the battle engines.
+
+BOSS AI AND SKILLS
+    This would be a simple change because there's no inherent difference between bosses and regular monsters, which do have shuffled AI, but I generally like to keep bosses somewhat vanilla to preserve some of the pacing, anchor the experience, and protect against potential softlocks in inescapable, mandatory battles.

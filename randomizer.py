@@ -6,7 +6,7 @@ from randomtools.utils import (
     classproperty, cached_property, utilrandom as random)
 from randomtools.interface import (
     run_interface, clean_and_write, finish_interface,
-    get_activated_codes, get_flags)
+    get_activated_codes, get_flags, get_outfile)
 from collections import Counter, defaultdict
 from math import ceil
 from sys import argv
@@ -1692,10 +1692,20 @@ def write_spoiler(all_objects):
     f.close()
 
 
+def write_cue_file():
+    filename = get_outfile()
+    cue_filename = '.'.join(filename.split('.')[:-1] + ['cue'])
+    f = open(cue_filename, 'w+')
+    f.write('FILE "{0}" BINARY\n\n'
+            'TRACK 01 MODE2/2352\n\n'
+            'INDEX 01 00:00:00\n'.format(filename))
+    f.close()
+
+
 if __name__ == '__main__':
     try:
-        print('You are using the Breath of Fire III '
-              'randomizer version %s.' % VERSION)
+        print('You are using the Breath of Fire III randomizer,\n'
+              '"The Vast and the Violent", version %s.\n' % VERSION)
 
         ALL_OBJECTS = [g for g in globals().values()
                        if isinstance(g, type) and issubclass(g, TableObject)
@@ -1731,6 +1741,7 @@ if __name__ == '__main__':
         clean_and_write(ALL_OBJECTS)
 
         write_spoiler(ALL_OBJECTS)
+        write_cue_file()
 
         finish_interface()
 
