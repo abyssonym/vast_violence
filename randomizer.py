@@ -13,7 +13,7 @@ from sys import argv
 from traceback import format_exc
 
 
-VERSION = 1
+VERSION = 2
 ALL_OBJECTS = None
 
 
@@ -202,12 +202,6 @@ class ItemMixin(NameMixin):
             self.set_bit(n, truth)
         self.set_bit('teepo', True)
 
-    def mutate(self):
-        super().mutate()
-        if (hasattr(self, 'equipability')
-                and EquipmentObject.flag in get_flags()):
-            self.mutate_equipability()
-
     def preclean(self):
         if hasattr(self, 'equipability') and self.old_data['equipability'] > 0:
             characters = ['ryu', 'nina', 'garr', 'rei', 'momo', 'peco']
@@ -266,6 +260,13 @@ class EquipmentObject(TableObject):
     flag = 'q'
     flag_description = 'equippable items'
     custom_random_enable = 'q'
+
+    def mutate(self):
+        assert self.index == 0
+        for i in ItemMixin.shuffle_items:
+            if hasattr(i, 'equipability'):
+                i.reseed('equip')
+                i.mutate_equipability()
 
 
 class FairyGiftObject(AcquireItemMixin): pass
@@ -1076,6 +1077,9 @@ class BaseStatsObject(NameMixin):
 
 
         for attr in sorted(self.old_data):
+            if (attr in ['weapon', 'shield', 'helmet', 'armor', 'accessories']
+                    and EquipmentObject.flag in get_flags()):
+                continue
             if self.flag not in get_flags():
                 assert getattr(self, attr) == self.old_data[attr]
             other_attrs = ['base_%s' % attr, 'current_%s' % attr]
