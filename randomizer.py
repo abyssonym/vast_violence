@@ -1,6 +1,7 @@
 from randomtools.tablereader import (
     TableObject, addresses, get_activated_patches, get_open_file,
-    mutate_normal, get_seed)
+    mutate_normal, get_seed, get_global_label,
+    get_random_degree, get_difficulty)
 from randomtools.utils import (
     classproperty, cached_property, utilrandom as random)
 from randomtools.interface import (
@@ -1582,6 +1583,67 @@ def activate_blue_magician_code():
         a.reset_skill_type(AbilityObject.EXAMINE_SKILL)
 
 
+def write_spoiler(all_objects):
+    SPOILER_FILENAME = 'bof3r_spoiler_{0}.txt'.format(get_seed())
+    f = open(SPOILER_FILENAME, 'w+')
+
+    f.write('{0} {1} {2} {3} {4}\n'.format(
+        get_global_label(), get_flags(), get_seed(),
+        get_random_degree()**0.5, get_difficulty()))
+
+    all_objects = sorted(all_objects, key=lambda x: x.__name__)
+    random_degrees = [(o.random_degree**0.5) for o in all_objects]
+    if len(set(random_degrees)) > 1:
+        f.write('R:{0}\n'.format(' '.join('%s' % rd for rd in random_degrees)))
+    random_diffs = [o.random_difficulty for o in all_objects]
+    if len(set(random_diffs)) > 1:
+        f.write('D:{0}\n'.format(' '.join('%s' % rd for rd in random_diffs)))
+
+    f.write('\n1. MASTERS\n'
+            '2. CHARACTERS\n'
+            '3. MONSTERS\n'
+            '4. SHOPS\n'
+            '5. MANILLOS\n'
+            '6. CHESTS\n\n')
+
+    f.write('1. MASTERS\n\n')
+    for mso in MasterStatsObject.every:
+        f.write(str(mso) + '\n\n')
+
+    f.write('2. CHARACTERS\n\n')
+    for bso in BaseStatsObject.every:
+        f.write(str(bso) + '\n\n')
+
+    f.write('3. MONSTERS\n\n')
+    for m in sorted(MonsterObject.every, key=lambda x: x.name):
+        if m.is_canonical:
+            f.write(str(m) + '\n\n')
+
+    f.write('4. SHOPS\n\n')
+    for s in ShopObject.every:
+        f.write(str(s) + '\n\n')
+
+    f.write('5. MANILLOS\n\n')
+    for mio in ManilloItemObject.every:
+        if 'AREA030' in mio.filename:
+            f.write(str(mio) + '\n')
+    f.write('\n')
+
+    f.write('6. CHESTS\n\n')
+    areas = {c.filename for c in ChestObject.every}
+    for a in sorted(areas):
+        chests = [c for c in ChestObject.every if c.filename == a]
+        area = a.split('/')[-1]
+        assert area.endswith('.EMI')
+        area = area[4:-4]
+        f.write('AREA {0}\n'.format(area))
+        for c in chests:
+            f.write(str(c) + '\n')
+        f.write('\n')
+
+    f.close()
+
+
 if __name__ == '__main__':
     try:
         print('You are using the Breath of Fire III '
@@ -1615,6 +1677,8 @@ if __name__ == '__main__':
 
         write_seed_number()
         clean_and_write(ALL_OBJECTS)
+
+        write_spoiler(ALL_OBJECTS)
 
         finish_interface()
 
