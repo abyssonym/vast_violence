@@ -1055,6 +1055,18 @@ class BaseStatsObject(NameMixin):
             self.base_max_hp = 999
 
 
+class BaseStats2Object(TableObject):
+    @classproperty
+    def after_order(self):
+        return [BaseStatsObject]
+
+    def cleanup(self):
+        for attr in self.old_data:
+            assert (self.old_data[attr] ==
+                    BaseStatsObject.get(self.index).old_data[attr])
+            setattr(self, attr, getattr(BaseStatsObject.get(self.index), attr))
+
+
 class ChestObject(DupeMixin, AcquireItemMixin):
     flag_description = 'treasure'
 
