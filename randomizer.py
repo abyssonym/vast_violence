@@ -1044,7 +1044,10 @@ class BaseStatsObject(NameMixin):
                 if other in self.old_data:
                     setattr(self, other, getattr(self, attr))
 
-        if 'easymodo' in get_activated_codes():
+        if self.name == 'Whelp':
+            self.attack_abilities = self.old_data['attack_abilities']
+
+        if 'easymodo' in get_activated_codes() or self.name == 'Whelp':
             self.accuracy = 100
             self.base_accuracy = 100
             self.current_hp = 999
@@ -1078,6 +1081,15 @@ class ChestObject(DupeMixin, AcquireItemMixin):
         filename = self.filename[-11:]
         assert filename.startswith('AREA') and filename.endswith('.EMI')
         return int(filename[-7:-4])
+
+    def cleanup(self):
+        super().cleanup()
+
+        if 'thinkwell' in get_activated_codes() and self.memory == 2:
+            self.item_type, self.item_index = 4, 0xf
+
+        if 'feyday' in get_activated_codes() and self.memory == 3:
+            self.item_type, self.item_index = 0, 0x57
 
 
 class GeneObject(TableObject):
@@ -1521,6 +1533,23 @@ def write_seed_number():
     b.write(seed2)
 
 
+def activate_blue_magician_code():
+    abilities = set([])
+    for m in MonsterObject.every:
+        if m.is_canonical:
+            abilities |= set(m.abilities)
+
+    for l in LevelObject.every:
+        if (l.charname not in BaseStatsObject.RESTRICTED_NAMES
+                and l.ability > 0):
+            a = AbilityObject.get(l.ability)
+            abilities -= {a}
+
+    for a in sorted(abilities):
+        a.set_bit('examinable', True)
+        a.reset_skill_type(AbilityObject.EXAMINE_SKILL)
+
+
 if __name__ == '__main__':
     try:
         print('You are using the Breath of Fire III '
@@ -1532,9 +1561,25 @@ if __name__ == '__main__':
         codes = {
             'easymodo': ['easymodo'],
             'equipanything': ['equipanything'],
+            #'feyday': ['feyday', 'faeday'],
+            'thinkwell': ['thinkwell'],
+            'bluemagician': ['bluemagician', 'bluemage'],
             }
         run_interface(ALL_OBJECTS, snes=False, codes=codes,
                       custom_degree=True, custom_difficulty=True)
+
+        if 'bluemagician' in get_activated_codes():
+            print('SKILL EXAMINE CODE ACTIVATED')
+            activate_blue_magician_code()
+
+        if 'thinkwell' in get_activated_codes():
+            print('FOUNTAIN PEN CODE ACTIVATED')
+
+        if 'equipanything' in get_activated_codes():
+            print('EQUIP ANYTHING CODE ACTIVATED')
+
+        if 'easymodo' in get_activated_codes():
+            print('DEBUG MODE ACTIVATED')
 
         write_seed_number()
         clean_and_write(ALL_OBJECTS)
