@@ -1,7 +1,6 @@
 EquipmentObject     empty.txt                   0                           1
 FairyGiftObject     struct_fairy_gift.txt       00848@BIN/ETC/COMMU00.EMI   20
 FairyExploreObject  struct_fairy_item.txt       04218@BIN/ETC/COMMU00.EMI   48
-FairyObject         struct_fairy.txt            04300@BIN/ETC/COMMU00.EMI   60
 FairyPrizeObject    struct_fairy_item.txt       2d900@BIN/ETC/COMMU02.EMI   48
 ItemObject          struct_item.txt             33964@BIN/ETC/GAME.EMI      92
 KeyItemObject       struct_key_item.txt         33fdc@BIN/ETC/GAME.EMI      16
@@ -17,6 +16,7 @@ BaseStatsObject     struct_base_stats.txt       72914@BIN/ETC/START.EMI     8
 BaseStats2Object    struct_base_stats.txt       1b114@BIN/ETC/STATUS.EMI    8
 ChestObject         struct_chest.txt            pointers_chests_1.1.txt
 GeneObject          struct_gene.txt             pointers_genes.txt
+FairyObject         struct_fairy.txt            pointers_fairies.txt
 FormationObject     struct_formation.txt        pointers_formations_1.1.txt
 ManilloItemObject   struct_manillo_item.txt     pointers_manillo_items_1.1.txt
 MonsterObject       struct_monster.txt          pointers_monsters_1.1.txt

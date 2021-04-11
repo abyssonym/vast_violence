@@ -270,8 +270,26 @@ class EquipmentObject(TableObject):
 
 class FairyGiftObject(AcquireItemMixin): pass
 class FairyExploreObject(AcquireItemMixin): pass
-class FairyObject(NameMixin): pass
 class FairyPrizeObject(AcquireItemMixin): pass
+
+
+class FairyObject(DupeMixin, NameMixin):
+    flag = 'c'
+
+    def randomize(self):
+        new_stats = []
+        for i in range(4):
+            f = random.choice(FairyObject.every)
+            new_stats.append(f.old_data['stats'][i])
+        self.stats = new_stats
+        assert len(self.stats) == len(self.old_data['stats'])
+
+    def set_name(self, name):
+        name = name.replace('.', '>')
+        self.fairy_name = name[:5].encode('ascii')
+        while len(self.fairy_name) < 5:
+            self.fairy_name += b'\xff'
+        assert len(self.fairy_name) == len(self.old_data['fairy_name'])
 
 
 class ItemObject(ItemMixin):
@@ -1137,9 +1155,6 @@ class ChestObject(DupeMixin, AcquireItemMixin):
         if 'thinkwell' in get_activated_codes() and self.memory == 2:
             self.item_type, self.item_index = 4, 0xf
 
-        if 'feyday' in get_activated_codes() and self.memory == 3:
-            self.item_type, self.item_index = 0, 0x57
-
 
 class GeneObject(TableObject):
     flag = 'g'
@@ -1599,6 +1614,23 @@ def activate_blue_magician_code():
         a.reset_skill_type(AbilityObject.EXAMINE_SKILL)
 
 
+def activate_feyday(filename):
+    f = open(filename)
+
+    names = sorted({line.strip() for line in f.readlines() if line.strip()})
+    if any(len(name) > 5 for name in names):
+        print('Warning: Name longer than 5 characters.')
+
+    FairyObject.class_reseed('names')
+    random.shuffle(names)
+    faeries = [fo for fo in FairyObject.every if fo.is_canonical]
+    random.shuffle(faeries)
+    for name, faerie in zip(names, faeries):
+        faerie.set_name(name)
+
+    f.close()
+
+
 def write_spoiler(all_objects):
     SPOILER_FILENAME = 'bof3r_spoiler_{0}.txt'.format(get_seed())
     f = open(SPOILER_FILENAME, 'w+')
@@ -1671,7 +1703,7 @@ if __name__ == '__main__':
         codes = {
             'easymodo': ['easymodo'],
             'equipanything': ['equipanything'],
-            #'feyday': ['feyday', 'faeday'],
+            'feyday': ['feyday', 'faeday'],
             'thinkwell': ['thinkwell'],
             'bluemagician': ['bluemagician', 'bluemage'],
             }
@@ -1690,6 +1722,10 @@ if __name__ == '__main__':
 
         if 'easymodo' in get_activated_codes():
             print('DEBUG MODE ACTIVATED')
+
+        if 'feyday' in get_activated_codes():
+            feytxt = input('Faerie names text file? ')
+            activate_feyday(feytxt)
 
         write_seed_number()
         clean_and_write(ALL_OBJECTS)
