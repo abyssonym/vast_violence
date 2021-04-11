@@ -965,7 +965,11 @@ class BaseStatsObject(NameMixin):
         initial_stats = {}
         for s in stats:
             chosen_bases[s] = random.choice(bases)
-            for old_l, new_l in zip(self.levels, chosen_bases[s].levels):
+            for (i, old_l) in enumerate(self.levels):
+                if i == 0:
+                    continue
+                i = mutate_normal(i, 1, 98, random_degree=self.random_degree)
+                new_l = chosen_bases[s].levels[i]
                 new_value = new_l.get_old_stat(s)
                 old_l.set_stat(s, new_value)
                 initial_stats[s] = chosen_bases[s].delevel_stats[s]
