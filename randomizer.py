@@ -1009,7 +1009,9 @@ class BaseStatsObject(NameMixin):
         while len(accessories) < 2:
             accessories.append(0)
 
-        if self.flag in get_flags():
+        ability_check = (self.flag in get_flags() and
+                         AbilityObject.flag in get_flags())
+        if ability_check:
             for ability_type in ['healing', 'assist', 'attack', 'skills']:
                 setattr(self, '%s_abilities' % ability_type, list([]))
 
@@ -1018,8 +1020,17 @@ class BaseStatsObject(NameMixin):
                     skill = AbilityObject.get(l.ability)
                     skill_type = skill.skill_type & 3
                     if self.name not in self.RESTRICTED_NAMES:
-                        assert not skill.get_bit('examinable')
-                        assert skill_type != AbilityObject.EXAMINE_SKILL
+                        try:
+                            assert not skill.get_bit('examinable')
+                            assert skill_type != AbilityObject.EXAMINE_SKILL
+                        except AssertionError:
+                            if MasterSkillsObject.flag not in get_flags():
+                                if not hasattr(BaseStatsObject, '_warn_msg'):
+                                    print('Warning: Without random masters, '
+                                          'skill conflict cannot be resolved.')
+                                    BaseStatsObject._warn_msg = True
+                            else:
+                                raise Exception('Skill conflict.')
 
                     if l.level <= self.level:
                         if skill_type == AbilityObject.HEALING_SKILL:
@@ -1039,6 +1050,11 @@ class BaseStatsObject(NameMixin):
                 while len(getattr(self, attr)) < len(self.old_data[attr]):
                     getattr(self, attr).append(0)
                 assert len(getattr(self, attr)) == len(self.old_data[attr])
+        else:
+            for ability_type in ['healing', 'assist', 'attack', 'skills']:
+                attr = '%s_abilities' % ability_type
+                assert getattr(self, attr) == self.old_data[attr]
+
 
         for attr in sorted(self.old_data):
             if self.flag not in get_flags():
