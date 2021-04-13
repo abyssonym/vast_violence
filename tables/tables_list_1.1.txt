@@ -31,3 +31,5 @@ $seed1len           14
 $seed2a             1598
 $seed2b             3c598
 $seed2len           c
+$master_list_afldkwa    18e2
+$master_list_first      3c8e2

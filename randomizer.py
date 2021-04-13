@@ -20,8 +20,33 @@ ALL_OBJECTS = None
 class NameMixin(TableObject):
     CHARSWAPS = {
         b'\xff': b'\x20',
+        b'\x8b': b'+',
+        b'\x3d': b'-',
         b'\x8e': b'\x27',
+        b'\x06': b'<NOCOLOR>',
+        b'\x01': b'\n',
+        b'\x05\x03': b'<BLUE>',
+        b'\x05\x02': b'<RED>',
         }
+
+    @classmethod
+    def convert_to_str(self, s):
+        for c in self.CHARSWAPS:
+            s = s.replace(c, self.CHARSWAPS[c])
+        return s.decode('ascii').rstrip('\x00')
+
+    @classmethod
+    def convert_from_str(self, s):
+        old_s = s
+        s = s.encode('ascii')
+        inverse_swaps = {}
+        for (a, b) in self.CHARSWAPS.items():
+            assert b not in inverse_swaps
+            inverse_swaps[b] = a
+        for c in inverse_swaps:
+            s = s.replace(c, inverse_swaps[c])
+        assert old_s == self.convert_to_str(s)
+        return s
 
     @property
     def name(self):
@@ -29,9 +54,7 @@ class NameMixin(TableObject):
             if attr.endswith('_name'):
                 name = getattr(self, attr)
                 break
-        for c in self.CHARSWAPS:
-            name = name.replace(c, self.CHARSWAPS[c])
-        return name.decode('ascii').rstrip('\x00')
+        return self.convert_to_str(name)
 
 
 class AcquireItemMixin(TableObject):
@@ -1763,6 +1786,115 @@ def write_cue_file():
     f.close()
 
 
+def rewrite_master_list():
+    if MasterStatsObject.flag not in get_flags():
+        return
+
+    f = get_open_file('BIN/ETC/AFLDKWA.EMI', sandbox=True)
+    f.seek(addresses.master_list_afldkwa)
+    messages = []
+    message = b''
+    while len(messages) < 17:
+        peek = f.read(1)
+        if peek == b'\x00':
+            messages.append(message)
+            message = b''
+        else:
+            message += peek
+
+    def format_entry(mso, entry, short=False):
+        if entry is None:
+            return '{0:3}{1:2}'.format('', '')
+
+        sign, attr = entry
+        value = abs(getattr(mso, attr))
+        if attr == 'dfn':
+            attr = 'Def'
+        elif attr in ['hp', 'ap']:
+            attr = attr.upper()
+        else:
+            attr = attr[0].upper() + attr[1:]
+
+        attr = attr[:2]
+        if short:
+            if sign == '+':
+                return '<BLUE>{0:2}{2}'.format(attr, sign, value)
+            elif sign == '-':
+                return '<RED>{0:2}{2}'.format(attr, sign, value)
+        else:
+            if sign == '+':
+                return '<BLUE>{0:3}{1}{2}'.format(attr, sign, value)
+            elif sign == '-':
+                return '<RED>{0:3}{1}{2}'.format(attr, sign, value)
+
+    new_messages = []
+    for mso in MasterStatsObject.every:
+        plus = [('+', attr) for (attr, _, _) in mso.specsattrs
+                if getattr(mso, attr) > 0]
+        minus = [('-', attr) for (attr, _, _) in mso.specsattrs
+                 if getattr(mso, attr) < 0]
+        plus, extra_plus = plus[:4], plus[4:]
+        minus, extra_minus = minus[:4], minus[4:]
+        plus += [None] * (4-len(plus))
+        minus += [None] * (4-len(minus))
+        if extra_plus:
+            minus[-len(extra_plus):] = extra_plus
+        if extra_minus:
+            plus[-len(extra_minus):] = extra_minus
+        assert len(plus) == len(minus) == 4
+        new_message = ''
+        short_message = ''
+        for left, right in zip(plus, minus):
+            if not (left or right):
+                continue
+
+            leftstr = format_entry(mso, left)
+            rightstr = format_entry(mso, right)
+            line = '{0} {1}'.format(leftstr, rightstr)
+            line = line.rstrip() + '\n'
+            new_message += line
+
+            leftstr = format_entry(mso, left, short=True)
+            rightstr = format_entry(mso, right, short=True)
+            line = '{0} {1}'.format(leftstr, rightstr)
+            line = line.rstrip() + '\n'
+            short_message += line
+
+        new_message = new_message.rstrip() + '<NOCOLOR>'
+        short_message = short_message.rstrip() + '<NOCOLOR>'
+
+        old_message = messages[len(new_messages)]
+        length = len(NameMixin.convert_from_str(new_message))
+        shortlength = len(NameMixin.convert_from_str(short_message))
+        if length <= len(old_message):
+            new_message += ' ' * (len(old_message)-length)
+            new_messages.append(new_message)
+        elif shortlength <= len(old_message):
+            short_message += ' ' * (len(old_message)-shortlength)
+            new_messages.append(short_message)
+        else:
+            shortest_message = '???<NOCOLOR>'
+            shortest_message += ' ' * (len(old_message) - 4)
+            new_messages.append(shortest_message)
+        assert (len(NameMixin.convert_from_str(new_messages[-1]))
+                == len(old_message))
+
+    new_messages = [NameMixin.convert_from_str(m) for m in new_messages]
+    target_length = sum([len(m) for m in messages])
+    current_length = sum([len(m) for m in new_messages])
+    assert current_length == target_length
+    assert len(messages) == len(new_messages)
+
+    new_data = b'\x00'.join(new_messages)
+    f.seek(addresses.master_list_afldkwa)
+    f.write(new_data)
+    f.close()
+    f = get_open_file('BIN/ETC/FIRST.EMI', sandbox=True)
+    f.seek(addresses.master_list_first)
+    f.write(new_data)
+    f.close()
+
+
 if __name__ == '__main__':
     try:
         print('You are using the Breath of Fire III randomizer,\n'
@@ -1804,6 +1936,7 @@ if __name__ == '__main__':
             write_patch(get_outfile(), 'patch_instant_text.txt')
 
         write_seed_number()
+        rewrite_master_list()
         clean_and_write(ALL_OBJECTS)
 
         write_spoiler(ALL_OBJECTS)
