@@ -13,7 +13,7 @@ from sys import argv
 from traceback import format_exc
 
 
-VERSION = 2
+VERSION = 2.1
 ALL_OBJECTS = None
 
 
@@ -1170,6 +1170,26 @@ class GeneObject(TableObject):
             assert 'patch_flame_gene.txt' in get_activated_patches()
             self.gene_index = 0
         assert 0 <= self.gene_index <= 0x11
+
+
+class ChrysmObject(TableObject):
+    @classproperty
+    def after_order(self):
+        return [GeneObject]
+
+    @property
+    def gene(self):
+        genes = [g for g in GeneObject.every if g.filename == self.filename]
+        assert len(genes) == 1
+        gene = genes[0]
+        try:
+            assert gene.old_data['gene_index'] == self.old_data['gene_index']
+        except:
+            import pdb; pdb.set_trace()
+        return gene
+
+    def cleanup(self):
+        self.gene_index = self.gene.gene_index
 
 
 class FormationObject(TableObject):
