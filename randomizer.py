@@ -1379,6 +1379,10 @@ class MonsterObject(DupeMixin, NameMixin):
     def abilities(self):
         abilities = set(self.initial_skills)
         for i in range(1, 5):
+            condition = getattr(self, 'condition%s' % i)
+            if condition >= 99:
+                assert condition == 99
+                continue
             abilities |= set(getattr(self, 'skills%s' % i))
         abilities = [AbilityObject.get(a) for a in sorted(abilities)]
         return abilities
@@ -1529,12 +1533,13 @@ class MonsterObject(DupeMixin, NameMixin):
             setattr(self, attr, skills)
 
     def mutate(self):
-        super().mutate()
-        self.mutate_resistances()
-        self.mutate_loot()
-        self.reseed('skills')
-        if AbilityObject.flag in get_flags() and not self.is_boss:
-            self.mutate_skills()
+        if self.is_canonical:
+            super().mutate()
+            self.mutate_resistances()
+            self.mutate_loot()
+            self.reseed('skills')
+            if AbilityObject.flag in get_flags() and not self.is_boss:
+                self.mutate_skills()
 
     def difficulty_boost(self):
         if self.random_difficulty == 1.0:
@@ -1582,17 +1587,19 @@ class MonsterObject(DupeMixin, NameMixin):
         self.reseed('difficulty')
         self.difficulty_boost()
 
-    def cleanup(self):
         if self.is_boss and self.random_difficulty >= 1.0:
             for attr in self.difficulty_attrs:
                 value = getattr(self, attr)
                 value = max(value, self.old_data[attr])
                 setattr(self, attr, value)
 
+    def cleanup(self):
         if ChestObject.flag not in get_flags():
             for attr in ['steal_item_index', 'steal_item_type', 'steal_rate',
                          'drop_item_index', 'drop_item_type', 'drop_rate']:
                 setattr(self, attr, self.old_data[attr])
+
+        super().cleanup()
 
         if 'easymodo' in get_activated_codes():
             self.hp = min(self.old_data['hp'], 1)
