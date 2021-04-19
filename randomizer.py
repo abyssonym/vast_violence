@@ -322,6 +322,8 @@ class AbilityObject(NameMixin):
     ATTACK_SKILL = 2
     EXAMINE_SKILL = 3
 
+    BANNED_SKILLS = ['Head Cracker']
+
     @property
     def intershuffle_valid(self):
         if self.rank < 0:
@@ -443,6 +445,9 @@ class AbilityObject(NameMixin):
                 del(name_ranks[name])
 
         for a in AbilityObject.every:
+            if a.name in AbilityObject.BANNED_SKILLS:
+                a._rank = -1
+                continue
             if a.name in name_ranks:
                 ranks = name_ranks[a.name]
                 a._rank = sum(ranks) / len(ranks)
@@ -450,6 +455,10 @@ class AbilityObject(NameMixin):
                 a._rank = -1
 
         return self.rank
+
+    def cleanup(self):
+        if self.name in self.BANNED_SKILLS:
+            self.set_bit('examinable', False)
 
 
 class LevelObject(TableObject):
