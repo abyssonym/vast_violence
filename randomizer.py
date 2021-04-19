@@ -1313,6 +1313,8 @@ class ManilloItemObject(DupeMixin, AcquireItemMixin):
             if current_value >= target_fish_value:
                 break
 
+        new_fishes = sorted(
+            new_fishes, key=lambda f: (99999 if f[0] is None else f[0].index))
         self.fish_indexes = [fish.index-0x38 if fish else 0xFF
                              for fish, n in new_fishes]
         self.fish_quantities = [n if fish else 0 for fish, n in new_fishes]
