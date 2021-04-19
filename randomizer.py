@@ -301,7 +301,13 @@ class ItemObject(ItemMixin):
 
 
 class KeyItemObject(NameMixin): pass
-class WeaponObject(ItemMixin): pass
+class WeaponObject(ItemMixin):
+    def cleanup(self):
+        super().cleanup()
+        if 'HE Shells' in self.name:
+            self.set_bit('momo', True)
+
+
 class ArmorObject(ItemMixin): pass
 class AccessoryObject(ItemMixin): pass
 
@@ -624,6 +630,19 @@ class ShopObject(TableObject):
             new_items.append(new_item)
 
         self.set_items(new_items)
+
+    def preclean(self):
+        if self.index == 0xd:
+            flame_chrysm = AcquireItemMixin.get_item_by_type_index(1, 0x47)
+            assert 'Flame Chrysm' in flame_chrysm.name
+            if flame_chrysm not in self.items:
+                new_items = list(self.items)
+                if (len(new_items) >=
+                        len(self.old_data['item_type_item_indexes'])):
+                    to_remove = random.choice(new_items)
+                    new_items.remove(to_remove)
+                new_items = [flame_chrysm] + new_items
+                self.set_items(new_items)
 
     def cleanup(self):
         sorted_items = sorted(
