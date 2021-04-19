@@ -1,0 +1,55 @@
+bb06c@SLUS_004.22:  00 00 00 00
+
+# b3780 -> 80149780
+# data begins again at b3800
+b3780@SLUS_004.22:
+        21 18 a0 02     # mov r3,r21
+        08 00 62 8c     # mov r2,[r3+8h]
+        00 00 00 00
+        00 02 42 28     # setlt r2,r2,2h
+        13 00 40 10     # jnz ???? (to the second section)
+        00 00 00 00
+
+        0c 00 02 8e     # mov r2,[r16+0Ch]
+        00 00 00 00
+
+        01 00 42 24     # add r2,1h
+        00 00 43 90     # movb r3,[r2]
+        f1 00 63 30     # and r3,0F1h
+        fc ff 60 14     # jnz r3,-0xc (to add r2)
+        00 00 00 00
+
+        fe ff 42 24     # sub r2,2h
+        0c 00 02 ae     # mov [r16+0Ch],r2
+        21 18 a0 02     # mov r3,r21
+        fc ff 63 24     # sub r3,4h
+        00 00 63 8c     # mov r3,[r3]
+        23 10 43 00     # sub r2,r3
+        fe ff 42 24     # sub r2,2h     # sometimes cuts off last character of message
+        00 12 02 00     # shl r2,8h
+        08 00 a2 ae     # mov [r21+8h],r2
+        78 43 05 08     # jmp 80150de0h
+        00 00 00 00
+
+        0c 00 02 8e     # mov r2,[r16+0Ch]
+        00 00 00 00
+        01 00 42 24     # add r2,1h
+        0c 00 02 ae     # mov [r16+0ch],r2
+        78 43 05 08     # jmp 80150de0h
+
+badd0:  e0 25 05 08     # jmp 80149780
+        00 00 00 00
+        00 00 00 00
+        00 00 00 00
+
+VALIDATION
+
+b3780@SLUS_004.22:  00 00 00 00
+                    00 00 00 00
+                    00 00 00 00
+                    00 00 00 00
+
+badd0@SLUS_004.22:  0c 00 02 8e
+                    00 00 00 00
+                    01 00 42 24
+                    0c 00 02 ae

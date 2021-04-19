@@ -1,7 +1,7 @@
 from randomtools.tablereader import (
     TableObject, addresses, get_activated_patches, get_open_file,
     mutate_normal, get_seed, get_global_label,
-    get_random_degree, get_difficulty)
+    get_random_degree, get_difficulty, write_patch)
 from randomtools.utils import (
     classproperty, cached_property, utilrandom as random)
 from randomtools.interface import (
@@ -1777,6 +1777,7 @@ if __name__ == '__main__':
             'feyday': ['feyday', 'faeday'],
             'thinkwell': ['thinkwell'],
             'bluemagician': ['bluemagician', 'bluemage'],
+            'speedread': ['speedread'],
             }
         run_interface(ALL_OBJECTS, snes=False, codes=codes,
                       custom_degree=True, custom_difficulty=True)
@@ -1797,6 +1798,10 @@ if __name__ == '__main__':
         if 'feyday' in get_activated_codes():
             feytxt = input('Faerie names text file? ')
             activate_feyday(feytxt)
+
+        if 'speedread' in get_activated_codes():
+            print('EXPERIMENTAL INSTANT TEXT MODE ACTIVATED')
+            write_patch(get_outfile(), 'patch_instant_text.txt')
 
         write_seed_number()
         clean_and_write(ALL_OBJECTS)
