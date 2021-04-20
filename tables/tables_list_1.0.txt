@@ -1,4 +1,5 @@
 EquipmentObject     empty.txt                   0                           1
+MonsterAbilityObject    empty.txt               0                           1
 FairyGiftObject     struct_fairy_gift.txt       00848@BIN/ETC/COMMU00.EMI   20
 FairyExploreObject  struct_fairy_item.txt       04218@BIN/ETC/COMMU00.EMI   48
 FairyPrizeObject    struct_fairy_item.txt       2d900@BIN/ETC/COMMU02.EMI   48

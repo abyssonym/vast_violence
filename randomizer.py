@@ -48,7 +48,7 @@ class NameMixin(TableObject):
         assert old_s == self.convert_to_str(s)
         return s
 
-    @property
+    @cached_property
     def name(self):
         for attr in self.old_data:
             if attr.endswith('_name'):
@@ -292,6 +292,18 @@ class EquipmentObject(TableObject):
                 i.mutate_equipability()
 
 
+class MonsterAbilityObject(TableObject):
+    flag = 'n'
+    flag_description = 'enemy abilities'
+    custom_random_enable = 'n'
+
+    def mutate(self):
+        for m in MonsterObject.every:
+            if m.is_boss or not m.is_canonical:
+                continue
+            m.mutate_skills()
+
+
 class FairyGiftObject(AcquireItemMixin): pass
 class FairyExploreObject(AcquireItemMixin): pass
 class FairyPrizeObject(AcquireItemMixin): pass
@@ -391,7 +403,7 @@ class AbilityObject(NameMixin):
     def is_offense(self):
         return self.get_bit('default_target_enemy')
 
-    @property
+    @cached_property
     def is_utility(self):
         elements = ['fire', 'ice', 'lightning', 'earth', 'wind', 'holy']
         for e in elements:
@@ -1589,8 +1601,6 @@ class MonsterObject(DupeMixin, NameMixin):
             self.mutate_resistances()
             self.mutate_loot()
             self.reseed('skills')
-            if AbilityObject.flag in get_flags() and not self.is_boss:
-                self.mutate_skills()
 
     def difficulty_boost(self):
         if self.random_difficulty == 1.0:
