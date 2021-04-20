@@ -1,6 +1,6 @@
 Breath of Fire 3 "The Vast and the Violent" Randomizer
-Version:    1
-Date:       April 11, 2021
+Version:    3
+Date:       April 19, 2021
 URL:        https://www.abyssonym.com/
             https://www.github.com/abyssonym
 Contact:    https://twitter.com/abyssonym
@@ -27,6 +27,7 @@ Contact:    https://twitter.com/abyssonym
     Even more additionally, you can also set a custom difficulty multiplier. This multiplier only affects enemy stats and affects them randomly, and the multiplier scales with enemy level, so the effect is greater the further you get into the game. 1.0 is the default and represents no boost, 2.0 means that the highest level enemies could potentially double all of their stats, etc.
 
     The randomizer has the following secret codes:
+        speedread           Enables a HIGHLY EXPERIMENTAL "instant text display" mode. Note that this is not thoroughly tested and could potentially result in softlocks.
         bluemagician        Make all skills (except levelup skills) examinable.
         equipanything       Make all characters able to equip any weapon or armor.
         thinkwell           Put a fountain pen in the chest near Rei's and Teepo's house.
@@ -36,3 +37,5 @@ Contact:    https://twitter.com/abyssonym
              so good luck coming up with that many short names.)
 
     If you have any questions, comments, or bug reports, please do not hesitate to contact me. I might not be able to get back to you right away, but it is nice to have messages to reference when I do get the time to revisit a project.
+
+    SPECIAL THANKS to secondadvent, who did much of the early reverse engineering on this game and graciously provided me with his documents.

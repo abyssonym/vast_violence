@@ -14,7 +14,7 @@ from sys import argv
 from traceback import format_exc
 
 
-VERSION = 2.1
+VERSION = '3.0'
 ALL_OBJECTS = None
 
 
@@ -1815,8 +1815,8 @@ def write_spoiler(all_objects):
     SPOILER_FILENAME = 'bof3r_spoiler_{0}.txt'.format(get_seed())
     f = open(SPOILER_FILENAME, 'w+')
 
-    f.write('{0} {1} {2} {3} {4}\n'.format(
-        get_global_label(), get_flags(), get_seed(),
+    f.write('{0} v{1} {2} {3} {4} {5}\n'.format(
+        get_global_label(), VERSION, get_flags(), get_seed(),
         get_random_degree()**0.5, get_difficulty()))
 
     all_objects = sorted(all_objects, key=lambda x: x.__name__)

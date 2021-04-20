@@ -13,10 +13,6 @@ NEW ENEMIES / MULTIPLE VARIANTS
 INFINITY GENE LOCATION
     This is not actually that difficult, and probably requires a simple ASM hack similar to some of the other genes, but this gene is acquired so late in the game (i.e. difficult to test), and requires so much AP, that I decided that including it in the randomization pool was not a priority.
 
-FAERIE VILLAGE SPEEDUP
-    This would require some ASM reverse engineering. Presumably there's an address or seven in memory that acts a battle counter, so you would want to monitor those and set a break point when you enter the village. I don't know if this will be helpful, but whenever you enter a new map the event scripts are loaded at 801f2c00, and faerie village are in the COMMU files and AREA 175-185.
-    By the way, events are multi-threaded! So don't bother trying to follow the control logic from the scripts themselves. Just use NO$PSX and set breakpoints instead.
-
 FISHING FISH
     This might not be too bad? We know where the Manillo shops are (AREA 030, 089, 129) and we know the item indexes of all the fish items. Might be able to find them with some kind of dragnet search. A bit more difficult than shooting fish in a barrel.
 
