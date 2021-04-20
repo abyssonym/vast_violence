@@ -1,0 +1,200 @@
+000 mcneil (spring and post-mcneil manor)
+001 dauna mine (as an adult)
+002 dauna mine (final area where you fight the Worker/Operator)
+003 cedar woods (spring, bunyan area)
+004 dauna mine (part of the intro or main menu scene)
+005 Cedar woods (your house area, spring)
+006 cedar woods (where ryu was found, spring)
+007 mcneil (pre nue)
+008 cedar woods (bunyan area, pre nue)
+009 cedar woods (where ryu was found, pre-nue)
+010 cedar woods (your house, pre nue)
+011 cedar woods (your house, balio&sunder)
+012 cedar woods (your house, post balio&sunder?)
+013 farm (spring, including adulthood)
+014 farm (pre nue)
+015 mcneil manor area (spring and adulthood)
+016 yraall region world map (spring and adulthood)
+017 mcneil manor area (pre nue)
+018 yraall road (spring and adulthood)
+019 yraall road (pre nue)
+020 yraal region random battlefield (Spring)
+021 syn city (first visit and after rei attacks)
+022 nue's cave, mt glaus
+023 mt glaus
+024 dauna mine (as a whelp, first couple areas)
+025 unknown (no enemies or text)
+026 mcneil manor courtyard (when breaking in)
+027 mcneil manor (inside)
+028 mcneil manor (roof and mcneil's room)
+029 yraal region random battlefield (pre-nue)
+030 fishing area
+031 part of the intro (used at the title screen if you wait)
+032 dauna mine (when garr finds you as an adult)
+033 yraal region world map (pre nue)
+034 dauna mine (similar to AREA020, but includes bais' script, AREA020 could be dummied)
+035 ogre road (includes the unused part with rei and the guard)
+036 unknown (no enemies, no script)
+037 wyndia (first visit, lower section)
+038 wyndia (first visit, upper section)
+039 wyndia castle (all visits, non-basement areas)
+040 momo's tower (1st floor)
+041 wyndia castle basement
+042 momo's tower, outside (puzzle game too?)
+043 checkpoint (mikba area)
+044 momo's tower (higher areas, not the top)
+045 world map, wyndia area
+046 checkpoint to rhapala (all times)
+047 ? area near wyndia (where you fall with honey, and the balcony too?)
+048 momo's tower (topmost area)
+049 the plant (all times)
+050 genmel
+051 mt. myrneg
+052 the dump
+053 camp scenes (story event camp scenes pre angel tower)
+054 areayou land in after riding the rocket
+055 yggdrasil area (where the yggdrasil master is)
+056 wyndian catacombs
+057 Rhapala (entrance area)
+058 junk town
+059 durandal's area
+060 bridge scene at the checkpoint
+061 mygas's area
+062 bandit's hideout
+063 central wyndia random battlefield
+064 eastern wyndia random battlefield?
+065 momo's tower areaworld map
+066 a scene between garr and deis?
+067 maekyss gorge (stallion fight area)
+068 the cafe
+069 eygnock road
+070 mt. levett
+071 second part of mt. boumore
+072 Rhapala arearandom battlefield
+073 Urkan area random battlefield
+074 urkan tapa
+075 steel beach
+076 outside of the lighthouse
+077 inside of the lighthouse (roof too)
+078 contest of champions (no enemies, outer area)
+079 contest of champions (first fight area)
+080 contest of champions (some second fight text, garr fight only)
+081 contest of champions (emitai fight)
+082 outside of angel tower
+083 inside angel tower (upper areas?)
+084 inside angel tower (lower floors?)
+085 inside angel tower (garr fight)
+086 steel beach freighter
+087 rhapala area world map
+088 urkan tapa area world map
+089 fishing area
+090 camp scenes (beginning up to getting close to angel tower the second time)
+091 scramasax woods (meryleep area :P)
+092 beyd training sessions
+093 unknown (possibly a hut in the rhapala area)
+094 rhapala's boat dock area
+095 ? area before mt. glaus (spring)
+096 ? area before mt. glaus (pre-nue)
+097 mt. zublo entrance
+098 deis' room in mt. zublo
+099 mt. boumore first area
+100 wyndia basement teleporter area
+101 legendary mariner's hut
+102 mt. zublo (early areas)
+103 mt. zublo (large area, where gisshan is)
+104 tidal caves entrance?
+105 tidal caves outside
+106 tidal caves inner area (where the tide cannot change)
+107 tidal caves inner area (tide can change)
+108 dauna mines (zombie dragon floor)
+109 dauna mines (some area in the mines without text)
+110 dauna hills area random battlefield?
+111 relay point a (platform room and above)
+112 relay point a (portal room to jack room)
+113 giotto's area
+114 master fisherman's hut
+115 dauna area world map
+116 emitai's house
+117 hidden factory in the plant (first little area)
+118 hidden factory (first numbered room area, and chrysm gas room)
+119 hidden factory (huge slug area)
+120 Cliff (gaist's area)
+121 steel beach area world map (includes ocean areas)
+122 yggdrasil in wyndia area?
+123 yggdrasil in kombinat area
+124 Lost Shore arearandom battlefield
+125 desert of death/desert arearandom battlefields
+126 when arriving to the kombinat area?
+127 steel grave
+128 machine guild dock (junk town)
+129 fishing area
+130 Parch
+131 zig's boat
+132 boat ride back from junk town?
+133 the boat after ramming the black ship
+134 black ship (ammonite part, and areas right before it)
+135 black ship (early areas, such as the crane room)
+136 black ship (boost counter part)
+137 black ship (no text area, bolt lord possible)
+138 factory (outside?)
+139 factory (also outside?)
+140 factory (big block room, with workbot crane)
+141 ryu's dream (first part)
+142 ryu's dream (last part)
+143 dragnier (above ground)
+144 dragnier (elder fight area)
+145 colony (outside)
+146 container yard (oh noes its a sextuple max hp archmage fight O_O")
+147 caer xhan (room with honey lookalike?)
+148 caer xhan (main lift area)
+149 caer xhan (the lift ride)
+150 oasis
+151 Kombinat areaworld map
+152 Dragnier areaworld map
+153 more camp scenes (adulthood scenes? includes early game ones as well...)
+154 even more camp scenes....
+155 Kombinat
+156 unknown (no enemies or script)
+157 caer xhan? (script says about a lock even rei couldn't open)
+158 boss lookalike rooms (sample 1)
+159 boss lookalike rooms (sample 2)
+160 boss lookalike rooms (sample 3)
+161 boss lookalike rooms (sample 4)
+162 boss lookalike rooms (sample 5 & 6)
+163 boss lookalike rooms (sample 7)
+164 boss lookalike rooms (sample 8)
+165 boss lookalike rooms (sample 9)
+166 boss lookalike rooms (sample 10 & 11 & 12)
+167 myria station (workers' area)
+168 myria station (main hall)
+169 myria station (an areawhere you can heal, with ice/red drakes?)
+170 myria station (room with HE shells)
+171 myria station (plant room, where HE shells are needed)
+172 Eden (teepo fight room)
+173 Myria station (AREAafter boss lookalike rooms)
+174 myria station (myria's room, no battle)
+175 faerie village (dolphin fight)
+176 faerie village (no fights, i think these are for different flower rings)
+177 faerie village (no fights)
+178 faerie village (no fights)
+179 faerie village (no fights)
+180 faerie village (no fights)
+181 faerie village (no fights)
+182 faerie village (no fights)
+183 faerie village (no fights)
+184 faerie village (no fights)
+185 faerie village (no fights)
+186 unknown (text says loop elevator)
+187 camp scenes (all adult ones, and some ship scenes)
+188 black ship (main scenes, can fight bolts/bolt archers)
+189 desert of death map
+190 unknown (no text or enemies)
+191 desert of death camp scenes
+192 desert of death camp scenes
+193 camp before headin into the desert of death
+194 kombinat areacamp scenes
+195 mt zublo entracne (adulthood version?)
+196 desert of death (manmo fight)
+197 myria station (chimera fight)
+198 myria station (myria fight)
+199 end of game (where you can choose to save, prob. plays credits too)

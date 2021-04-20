@@ -1,6 +1,6 @@
 from randomtools.tablereader import (
     TableObject, addresses, get_activated_patches, get_open_file,
-    mutate_normal, get_seed, get_global_label,
+    mutate_normal, get_seed, get_global_label, tblpath,
     get_random_degree, get_difficulty, write_patch)
 from randomtools.utils import (
     classproperty, cached_property, utilrandom as random)
@@ -9,6 +9,7 @@ from randomtools.interface import (
     get_activated_codes, get_flags, get_outfile)
 from collections import Counter, defaultdict
 from math import ceil
+from os import path
 from sys import argv
 from traceback import format_exc
 
@@ -572,11 +573,27 @@ class ShopObject(TableObject):
     custom_random_enable = 's'
 
     def __repr__(self):
-        s = 'SHOP {0:0>2X} {1:0>2X}\n'.format(self.index, self.unknown)
+        s = 'SHOP {0:0>2X} {1}\n'.format(self.index, self.name)
         for item in self.items:
             if item.name != 'Nothing':
                 s += '  {0:12} {1:>5}\n'.format(item.name, item.price)
         return s.strip()
+
+    @property
+    def name(self):
+        if hasattr(self, '_name'):
+            return self._name
+
+        index_names = {}
+        with open(path.join(tblpath, 'names_shops.txt')) as f:
+            for (i, line) in enumerate(f.readlines()):
+                line = line.strip()
+                index_names[i] = line
+
+        for s in ShopObject.every:
+            s._name = index_names[s.index].upper()
+
+        return self.name
 
     @property
     def comparison(self):
@@ -712,6 +729,8 @@ class ShopObject(TableObject):
         sorted_items = [i for i in sorted_items if i.index > 0]
         if not 0x11 <= self.index <= 0x16:  # faerie shops
             self.set_items(sorted_items)
+
+        self.num_items = len([i for i in self.item_type_item_indexes if i])
 
         while len(self.items) < len(self.old_data['item_type_item_indexes']):
             self.item_type_item_indexes.append(0)
@@ -1204,6 +1223,31 @@ class BaseStats2Object(TableObject):
             setattr(self, attr, getattr(BaseStatsObject.get(self.index), attr))
 
 
+class ManilloStockObject(TableObject):
+    def __repr__(self):
+        s = 'TRADER {0:0>2X} ({1})\n'.format(self.index, self.name.upper())
+        for t in self.trades:
+            s += '  %s\n' % t
+        return s.strip()
+
+    @property
+    def name(self):
+        return {
+            0: 'Farm',
+            2: 'Tower',
+            7: 'Urkan Tapa',
+            9: 'Dauna Mine',
+            0xb: 'Cliff',
+            0xd: 'Steel Beach',
+            0xf: 'Kombinat',
+            }[self.index]
+
+    @property
+    def trades(self):
+        return [ManilloItemObject.get(i)
+                for i in self.trade_indexes if i != 0xFF]
+
+
 class ChestObject(DupeMixin, AcquireItemMixin):
     flag_description = 'treasure'
 
@@ -1230,6 +1274,31 @@ class ChestObject(DupeMixin, AcquireItemMixin):
         filename = self.filename[-11:]
         assert filename.startswith('AREA') and filename.endswith('.EMI')
         return int(filename[-7:-4])
+
+    @property
+    def area_name(self):
+        if hasattr(self, '_area_name'):
+            return self._area_name
+
+        area_names = {}
+        with open(path.join(tblpath, 'names_areas.txt')) as f:
+            for line in f:
+                index, description = line.strip().split(' ', 1)
+                index = int(index)
+                if '(' in description:
+                    area, location = description.split('(', 1)
+                    location = '(' + location
+                else:
+                    area = description
+                    location = ''
+                area = area.upper()
+                location = location.lower()
+                area_names[index] = '{0} {1}'.format(area, location).strip()
+
+        for c in ChestObject.every:
+            c._area_name = area_names[c.area_code]
+
+        return self.area_name
 
     def cleanup(self):
         super().cleanup()
@@ -1309,8 +1378,7 @@ class ManilloItemObject(DupeMixin, AcquireItemMixin):
     def __repr__(self):
         fishdesc = ', '.join(
             '{0} x{1}'.format(fish.name, n) for (fish, n) in self.fishes)
-        s = 'TRADE {0:0>2X}: {1} ({2})'.format(
-            self.index, self.item.name, fishdesc)
+        s = '{1} ({2})'.format(self.index, self.item.name, fishdesc)
         return s.strip()
 
     @property
@@ -1784,19 +1852,18 @@ def write_spoiler(all_objects):
         f.write(str(s) + '\n\n')
 
     f.write('5. MANILLOS\n\n')
-    for mio in ManilloItemObject.every:
-        if 'AREA030' in mio.filename:
-            f.write(str(mio) + '\n')
-    f.write('\n')
+    for mso in ManilloStockObject.every:
+        if mso.trades:
+            f.write(str(mso) + '\n\n')
 
     f.write('6. CHESTS\n\n')
-    areas = {c.filename for c in ChestObject.every}
+    areas = {c.area_code for c in ChestObject.every}
     for a in sorted(areas):
-        chests = [c for c in ChestObject.every if c.filename == a]
-        area = a.split('/')[-1]
-        assert area.endswith('.EMI')
-        area = area[4:-4]
-        f.write('AREA {0}\n'.format(area))
+        chests = [c for c in ChestObject.every if c.area_code == a]
+        if not chests:
+            continue
+        area_name = chests[0].area_name
+        f.write('AREA {0} {1}\n'.format(a, area_name))
         for c in chests:
             f.write(str(c) + '\n')
         f.write('\n')

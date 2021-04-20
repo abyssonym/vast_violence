@@ -15,6 +15,7 @@ MasterSkillsObject  struct_master_skills.txt    03c88@BIN/ETC/SISYOU.EMI    17
 MasterStatsObject   struct_master_stats.txt     03d54@BIN/ETC/SISYOU.EMI    17
 BaseStatsObject     struct_base_stats.txt       72914@BIN/ETC/START.EMI     8
 BaseStats2Object    struct_base_stats.txt       1b114@BIN/ETC/STATUS.EMI    8
+ManilloStockObject  struct_manillo_stock.txt    3e53a@BIN/WORLD00/AREA030.EMI   16
 ChestObject         struct_chest.txt            pointers_chests_1.0.txt
 GeneObject          struct_gene.txt             pointers_genes.txt
 ChrysmObject        struct_gene.txt             pointers_chrysm.txt

@@ -1,2 +1,2 @@
-unknown,1
+num_items,1
 item_type_item_indexes,11x2,list

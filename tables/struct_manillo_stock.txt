@@ -1,0 +1,1 @@
+trade_indexes,10,list
