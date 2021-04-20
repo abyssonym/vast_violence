@@ -84,13 +84,28 @@ class AcquireItemMixin(TableObject):
             return 'NONE'
         return item.name
 
-    def mutate(self):
+    def mutate(self, unique=False):
         item = self.item
-        if item is None:
-            candidates = [i for i in ItemMixin.ranked_shuffle_items
-                          if 0 <= i.old_data['price'] <= self.value]
-            item = candidates[-1]
-        new_item = item.get_similar(random_degree=self.random_degree)
+
+        if not hasattr(self.__class__, '_DONE_ITEMS'):
+            self.__class__._DONE_ITEMS = set()
+
+        for _ in range(100):
+            if item is None:
+                candidates = [i for i in ItemMixin.ranked_shuffle_items
+                              if 0 <= i.old_data['price'] <= self.value]
+                item = candidates[-1]
+
+            if item.rank < 0 or not item.intershuffle_valid:
+                new_item = item
+                break
+
+            new_item = item.get_similar(random_degree=self.random_degree)
+            if unique and new_item in self.__class__._DONE_ITEMS:
+                continue
+            self.__class__._DONE_ITEMS.add(new_item)
+            break
+
         self.item_index = new_item.index
         self.item_type = ItemMixin.item_type_from_item(new_item)
 
@@ -1309,7 +1324,10 @@ class ManilloItemObject(DupeMixin, AcquireItemMixin):
         return fishes
 
     def mutate(self):
-        super().mutate()
+        if not self.is_canonical:
+            return
+
+        super().mutate(unique=True)
         if self.random_degree == 0:
             return
 
