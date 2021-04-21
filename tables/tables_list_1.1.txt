@@ -26,7 +26,6 @@ MonsterObject       struct_monster.txt          pointers_monsters_1.1.txt
 .patch              patch_flame_gene.txt
 .option             patch_fast_faefolk.txt
 .option             patch_fast_text.txt
-#.option             patch_instant_text.txt
 $seed1a             1571
 $seed1b             3c571
 $seed1len           14

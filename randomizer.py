@@ -14,7 +14,7 @@ from sys import argv
 from traceback import format_exc
 
 
-VERSION = '3.0'
+VERSION = '3.1'
 ALL_OBJECTS = None
 
 
@@ -2004,7 +2004,6 @@ if __name__ == '__main__':
             'feyday': ['feyday', 'faeday'],
             'thinkwell': ['thinkwell'],
             'bluemagician': ['bluemagician', 'bluemage'],
-            'speedread': ['speedread'],
             }
         run_interface(ALL_OBJECTS, snes=False, codes=codes,
                       custom_degree=True, custom_difficulty=True)
@@ -2025,10 +2024,6 @@ if __name__ == '__main__':
         if 'feyday' in get_activated_codes():
             feytxt = input('Faerie names text file? ')
             activate_feyday(feytxt)
-
-        if 'speedread' in get_activated_codes():
-            print('EXPERIMENTAL INSTANT TEXT MODE ACTIVATED')
-            write_patch(get_outfile(), 'patch_instant_text.txt')
 
         write_seed_number()
         rewrite_master_list()
