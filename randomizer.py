@@ -14,7 +14,7 @@ from sys import argv
 from traceback import format_exc
 
 
-VERSION = '3.1'
+VERSION = '3.2'
 ALL_OBJECTS = None
 
 
@@ -24,10 +24,11 @@ class NameMixin(TableObject):
         b'\x8b': b'+',
         b'\x3d': b'-',
         b'\x8e': b'\x27',
-        b'\x06': b'<NOCOLOR>',
+        b'\x06': b'$NOCOLOR$',
         b'\x01': b'\n',
-        b'\x05\x03': b'<BLUE>',
-        b'\x05\x02': b'<RED>',
+        b'\x05\x03': b'$BLUE$',
+        b'\x05\x02': b'$RED$',
+        b'>': b'.',
         }
 
     @classmethod
@@ -48,6 +49,19 @@ class NameMixin(TableObject):
             s = s.replace(c, inverse_swaps[c])
         assert old_s == self.convert_to_str(s)
         return s
+
+    def set_name(self, name):
+        self.old_name
+        name = self.convert_from_str(name)
+        attr = self._name_attr
+        length = [l for (a, l, _) in self.specsattrs if a == attr][0]
+        if len(name) > length:
+            print('WARNING: Name %s too long. Truncating.' % name)
+            name = name[:length]
+        while len(name) < length:
+            name += b'\xff'
+        setattr(self, attr, name)
+        assert len(getattr(self, attr)) == len(self.old_data[attr])
 
     @property
     def name(self):
@@ -346,13 +360,6 @@ class FairyObject(DupeMixin, NameMixin):
         self.stats = new_stats
         assert len(self.stats) == len(self.old_data['stats'])
 
-    def set_name(self, name):
-        name = name.replace('.', '>')
-        self.fairy_name = name[:5].encode('ascii')
-        while len(self.fairy_name) < 5:
-            self.fairy_name += b'\xff'
-        assert len(self.fairy_name) == len(self.old_data['fairy_name'])
-
 
 class ItemObject(ItemMixin):
     @property
@@ -542,6 +549,9 @@ class AbilityObject(NameMixin):
     def cleanup(self):
         if self.old_name in self.BANNED_SKILLS:
             self.set_bit('examinable', False)
+
+        if hasattr(self, '_rename'):
+            self.set_name(self._rename)
 
 
 class LevelObject(TableObject):
@@ -1874,6 +1884,25 @@ def activate_feyday(filename):
     f.close()
 
 
+def activate_abilonym(filename):
+    with open(filename) as f:
+        for line in f:
+            if '#' in line:
+                line, _ = line.split('#', 1)
+            line = line.strip()
+            if not line:
+                continue
+
+            if ' ' not in line:
+                index, name = line, ''
+            else:
+                index, name = line.split(' ', 1)
+            index, name = index.strip(), name.strip()
+            index = int(index, 0x10)
+            a = AbilityObject.get(index)
+            a._rename = name
+
+
 def write_spoiler(all_objects):
     SPOILER_FILENAME = 'bof3r_spoiler_{0}.txt'.format(get_seed())
     f = open(SPOILER_FILENAME, 'w+')
@@ -1976,14 +2005,14 @@ def rewrite_master_list():
         attr = attr[:2]
         if short:
             if sign == '+':
-                return '<BLUE>{0:2}{2}'.format(attr, sign, value)
+                return '$BLUE${0:2}{2}'.format(attr, sign, value)
             elif sign == '-':
-                return '<RED>{0:2}{2}'.format(attr, sign, value)
+                return '$RED${0:2}{2}'.format(attr, sign, value)
         else:
             if sign == '+':
-                return '<BLUE>{0:3}{1}{2}'.format(attr, sign, value)
+                return '$BLUE${0:3}{1}{2}'.format(attr, sign, value)
             elif sign == '-':
-                return '<RED>{0:3}{1}{2}'.format(attr, sign, value)
+                return '$RED${0:3}{1}{2}'.format(attr, sign, value)
 
     new_messages = []
     for mso in MasterStatsObject.every:
@@ -2018,8 +2047,8 @@ def rewrite_master_list():
             line = line.rstrip() + '\n'
             short_message += line
 
-        new_message = new_message.rstrip() + '<NOCOLOR>'
-        short_message = short_message.rstrip() + '<NOCOLOR>'
+        new_message = new_message.rstrip() + '$NOCOLOR$'
+        short_message = short_message.rstrip() + '$NOCOLOR$'
 
         old_message = messages[len(new_messages)]
         length = len(NameMixin.convert_from_str(new_message))
@@ -2031,7 +2060,7 @@ def rewrite_master_list():
             short_message += ' ' * (len(old_message)-shortlength)
             new_messages.append(short_message)
         else:
-            shortest_message = '???<NOCOLOR>'
+            shortest_message = '???$NOCOLOR$'
             shortest_message += ' ' * (len(old_message) - 4)
             new_messages.append(shortest_message)
         assert (len(NameMixin.convert_from_str(new_messages[-1]))
@@ -2067,6 +2096,7 @@ if __name__ == '__main__':
             'feyday': ['feyday', 'faeday'],
             'thinkwell': ['thinkwell'],
             'bluemagician': ['bluemagician', 'bluemage'],
+            'abilonym': ['abilonym'],
             }
         run_interface(ALL_OBJECTS, snes=False, codes=codes,
                       custom_degree=True, custom_difficulty=True)
@@ -2087,6 +2117,10 @@ if __name__ == '__main__':
         if 'feyday' in get_activated_codes():
             feytxt = input('Faerie names text file? ')
             activate_feyday(feytxt)
+
+        if 'abilonym' in get_activated_codes():
+            abiltxt = input('Ability names text file? ')
+            activate_abilonym(abiltxt)
 
         write_seed_number()
         rewrite_master_list()

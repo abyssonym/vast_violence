@@ -1,0 +1,228 @@
+00 
+01 Nue Stomp
+02 Gambit
+03 Super Combo
+04 ThundrStrike
+05 Flame Strike
+06 Mind Sword
+07 Mind Flay
+08 Blind
+09 Chlorine
+0A Unmotivate
+0B Multistrike
+0C Blitz
+0D Snap
+0E Flying Kick
+0F Charge
+10 Air Raid
+11 Astral Warp
+12 Giant Growth
+13 Aura
+14 Disembowel
+15 Bonebreak
+16 Spirit Blast
+17 Bad back
+18 Watch Enemy
+19 Noting
+1A Counter
+1B Hypnotize
+1C Devour
+1D Wind Strike
+1E Molasses
+1F Tarbaby
+20 Absorb
+21 Healing Herb
+22 Steroids
+23 Magic Belt
+24 Recall
+25 MagicShuffle
+26 War Shout
+27 Focus
+28 Enlighten
+29 Berserk
+2A Mind's Eye
+2B WardOfLight
+2C Evil Eye
+2D Bone Dart
+2E Firebreath
+2F Icebreath
+30 Dream Breath
+31 Frost Strike
+32 Pollen
+33 Venom Breath
+34 Ovum
+35 Lavaburst
+36 Howling
+37 Ebonfire
+38 Sacrifice
+39 Bone Dance
+3A Sanctuary
+3B Tornado
+3C Identify
+3D Target
+3E Celerity
+3F SuddenDeath
+40 Weretiger
+41 Pilfer
+42 Tsunami
+43 Chill
+44 Foretell
+45 Influence
+46 Heal
+47 Rejuvenate
+48 Restore
+49 Vitalize
+4A Vigor
+4B Purify
+4C Raise Dead
+4D Resurrect
+4E Leech Power
+4F Drain
+50 Noting
+51 RottenBreath
+52 Protect
+53 Shield
+54 Speed
+55 Might
+56 Barrier
+57 Silence
+58 Slow
+59 Blunt
+5A Weaken
+5B Flare
+5C Fireblast
+5D Inferno
+5E Frost
+5F Iceblast
+60 Blizzard
+61 Jolt
+62 Lightning
+63 Myollnir
+64 Cyclone
+65 Typhoon
+66 Quake
+67 Simoon
+68 Sirocco
+69 Kyrie
+6A Death
+6B Sleep
+6C Confuse
+6D Depress
+6E Ragnarok
+6F Noting
+70 Noting
+71 Noting
+72 Fire Whip
+73 Remedy
+74 UtmostAttack
+75 Rest
+76 Burn
+77 Double Blow
+78 Whelp Breath
+79 DragonBreath
+7A Flame Breath
+7B Frost Breath
+7C ThundrBreath
+7D DivineBreath
+7E ShadowBreath
+7F Noting
+80 Head Cracker
+81 Holocaust
+82 Venom
+83 KaiserBreath
+84 Doom Breath
+85 Flame Claw
+86 Frost Claw
+87 Thunder Claw
+88 Shining Claw
+89 Corona
+8A Main Cannon
+8B Paralyzer
+8C Trump
+8D Triple Blow
+8E Syphon
+8F Thunder Clap
+90 Wall of Fire
+91 Noting
+92 Noting
+93 Noting
+94 Noting
+95 Douse
+96 Eye Beam
+97 Accession
+98 Snooze
+99 Resist
+9A Mighty Chop
+9B Pyrokinesis
+9C Holy Strike
+9D Demonbane
+9E Charm
+9F Gloom
+A0 Jump
+A1 Timed Blow
+A2 Transfer
+A3 Meditation
+A4 Feign Swing
+A5 Backhand
+A6 Monopolize
+A7 Last Resort
+A8 Cure
+A9 Benediction
+AA Risky Blow
+AB Shadowwalk
+AC Magic Ball
+AD Intimidate
+AE Heal
+AF Rejuvenate
+B0 Restore
+B1 Vitalize
+B2 Vigor
+B3 Purify
+B4 Raise Dead
+B5 Resurrect
+B6 Leech Power
+B7 Drain
+B8 Protect
+B9 Shield
+BA Speed
+BB Might
+BC Barrier
+BD Silence
+BE Slow
+BF Blunt
+C0 Weaken
+C1 Flare
+C2 Fireblast
+C3 Inferno
+C4 Frost
+C5 Iceblast
+C6 Blizzard
+C7 Jolt
+C8 Lightning
+C9 Myollnir
+CA Cyclone
+CB Typhoon
+CC Quake
+CD Simoon
+CE Sirocco
+CF Kyrie
+D0 Death
+D1 Sleep
+D2 Confuse
+D3 Depress
+D4 Ragnarok
+D5 Noting
+D6 Noting
+D7 Remedy
+D8 Steal
+D9 Restore Form
+DA Aura Breath
+DB Magma Breath
+DC Geo Breath
+DD Gaea'sBreath
+DE Combustion
+DF Tempest
+E0 Hurricane
+E1 Temptation
+E2 MeteorStrike
+E3 MeteorStrike

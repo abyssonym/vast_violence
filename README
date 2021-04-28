@@ -1,6 +1,6 @@
 Breath of Fire 3 "The Vast and the Violent" Randomizer
 Version:    3
-Date:       April 21, 2021
+Date:       April 28, 2021
 URL:        https://www.abyssonym.com/
             https://www.github.com/abyssonym
 Contact:    https://twitter.com/abyssonym
@@ -31,9 +31,12 @@ Contact:    https://twitter.com/abyssonym
         equipanything       Make all characters able to equip any weapon or armor.
         thinkwell           Put a fountain pen in the chest near Rei's and Teepo's house.
         feyday              Custom rename the fairies in your village.
-            (You will need to input the name of a text file, with each new fairy name on a separate line.
-             The character limit is 5, and there are 60 fairies total,
-             so good luck coming up with that many short names.)
+            You will need to input the name of a text file, with each new fairy name on a line.
+            The character limit is 5, and there are 60 fairies total.
+        abilonym            Custom rename the abilities in the game.
+            You will need to input the name of a text file.
+            Edit the template file "ability_names.txt" to enter your chosen names.
+            The character limit is 12.
 
     If you have any questions, comments, or bug reports, please do not hesitate to contact me. I might not be able to get back to you right away, but it is nice to have messages to reference when I do get the time to revisit a project.
 
