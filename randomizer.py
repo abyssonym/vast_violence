@@ -1799,6 +1799,10 @@ class MonsterObject(DupeMixin, NameMixin):
                 value = max(value, self.old_data[attr])
                 setattr(self, attr, value)
 
+        if self.name in ['Gary', 'Mogu']:
+            for attr in self.difficulty_attrs:
+                setattr(self, attr, self.old_data[attr])
+
     def cleanup(self):
         if ChestObject.flag not in get_flags():
             for attr in ['steal_item_index', 'steal_item_type', 'steal_rate',
