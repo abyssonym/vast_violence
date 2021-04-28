@@ -25,7 +25,7 @@ ManilloItemObject   struct_manillo_item.txt     pointers_manillo_items_1.0.txt
 MonsterObject       struct_monster.txt          pointers_monsters_1.0.txt
 .patch              patch_flame_gene.txt
 .option             patch_fast_faefolk.txt
-.option             patch_fast_text.txt
+.option             patch_fast_text_1.0.txt
 $seed1a             156b
 $seed1b             3c56b
 $seed1len           14

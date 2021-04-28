@@ -1,0 +1,52 @@
+# 8015106c
+bb06c@SLUS_004.22:  00 00 00 00
+
+# 80159568
+c3568:  f0 25 05 0c
+
+# 801497c0
+b37c0:  f8 40 05 0c 00 00 00 00
+        f8 40 05 0c 00 00 00 00
+        f8 40 05 0c 00 00 00 00
+        f8 40 05 0c 00 00 00 00
+        f8 40 05 0c 00 00 00 00
+        f8 40 05 0c 00 00 00 00
+#        f8 40 05 0c 00 00 00 00
+        5c 65 05 08
+
+# 801f3a10
+# Shorten the pan length during Nina & lifts cutscene
+d1610@BIN/WORLD02/AREA099.EMI:
+        fa 04 06 06
+
+# 8001089f
+# Force slowdown of Rei's text during cutscene
+ae08c@BIN/WORLD00/AREA011.EMI:
+        4e 6f 6f 6f 6f 6f 5d 02
+        3e 3e 3e 02
+        3e 3e 02
+        3e 02
+        02
+        16
+
+VALIDATION
+
+bb06c@SLUS_004.22:  17 00 43 14
+
+c3568:  f8 40 05 0c
+
+b37c0:  00 00 00 00 00 00 00 00
+        00 00 00 00 00 00 00 00
+        00 00 00 00 00 00 00 00
+        00 00 00 00 00 00 00 00
+        00 00 00 00 00 00 00 00
+        00 00 00 00 00 00 00 00
+        00 00 00 00 00 00 00 00
+        00 00 00 00 00 00 00 00
+
+d1610@BIN/WORLD02/AREA099.EMI:
+        fa 04 0a 06
+
+ae08c@BIN/WORLD00/AREA011.EMI:
+        4e 6f 6f 6f 6f 6f 6f 6f 6f 6f 6f 6f 6f 5d
+        3e 3e 3e 3e 16
