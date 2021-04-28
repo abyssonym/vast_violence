@@ -49,11 +49,21 @@ class NameMixin(TableObject):
         assert old_s == self.convert_to_str(s)
         return s
 
-    @cached_property
+    @property
     def name(self):
+        old_name = self.old_name
+        if getattr(self, self._name_attr) == self.old_data[self._name_attr]:
+            return old_name
+        else:
+            name = getattr(self, self._name_attr)
+        return self.convert_to_str(name)
+
+    @cached_property
+    def old_name(self):
         for attr in self.old_data:
             if attr.endswith('_name'):
-                name = getattr(self, attr)
+                self._name_attr = attr
+                name = self.old_data[attr]
                 break
         return self.convert_to_str(name)
 
@@ -373,7 +383,8 @@ class AbilityObject(NameMixin):
     ATTACK_SKILL = 2
     EXAMINE_SKILL = 3
 
-    BANNED_SKILLS = ['Head Cracker']
+    BANNED_SKILLS = ['Head Cracker', 'Nue Stomp']
+    LEVELUP_BANNED_SKILLS = ['Backhand']
 
     @property
     def intershuffle_valid(self):
@@ -384,15 +395,35 @@ class AbilityObject(NameMixin):
 
     @property
     def is_spare_levelup_skill(self):
-        if len([a for a in self.every if a.name == self.name]) == 1:
+        if len([a for a in self.every if a.old_name == self.old_name]) == 1:
             return False
         return not self.intershuffle_valid
+
+    @property
+    def is_boss_skill(self):
+        if hasattr(self, '_is_boss_skill'):
+            return self._is_boss_skill
+
+        for a in AbilityObject.every:
+            a._is_boss_skill = False
+
+        for m in MonsterObject.every:
+            if m.is_boss:
+                for a in m.abilities:
+                    a._is_boss_skill = True
+
+        for m in MonsterObject.every:
+            if not m.is_boss:
+                for a in m.abilities:
+                    a._is_boss_skill = False
+
+        return self.is_boss_skill
 
     @cached_property
     def examine_alt(self):
         if self.name == 'Noting':
             return None
-        selves = [a for a in self.every if a.name == self.name]
+        selves = [a for a in self.every if a.old_name == self.old_name]
         if len(selves) == 1:
             return self
         examinable = [a for a in selves if a.get_bit('examinable')]
@@ -405,7 +436,7 @@ class AbilityObject(NameMixin):
     def levelup_alt(self):
         if self.name == 'Noting':
             return None
-        selves = [a for a in self.every if a.name == self.name]
+        selves = [a for a in self.every if a.old_name == self.old_name]
         if len(selves) == 1:
             return self
         unexaminable = [a for a in selves if not a.get_bit('examinable')]
@@ -471,7 +502,8 @@ class AbilityObject(NameMixin):
                 a._levelup_rank = a._levelup_rank or bs.level / max_level
                 a._levelup_rank = min(a._levelup_rank, bs.level / max_level)
 
-        max_level = max([max(ms.levels) for ms in MasterSkillsObject.every]) + 1
+        max_level = (max([max(ms.levels) for ms in MasterSkillsObject.every])
+                     + 1)
         for ms in MasterSkillsObject.every:
             for level, skill in zip(ms.levels, ms.skills):
                 skill._master_rank = skill._master_rank or level / max_level
@@ -496,7 +528,7 @@ class AbilityObject(NameMixin):
                 del(name_ranks[name])
 
         for a in AbilityObject.every:
-            if a.name in AbilityObject.BANNED_SKILLS:
+            if a.old_name in AbilityObject.BANNED_SKILLS:
                 a._rank = -1
                 continue
             if a.name in name_ranks:
@@ -508,7 +540,7 @@ class AbilityObject(NameMixin):
         return self.rank
 
     def cleanup(self):
-        if self.name in self.BANNED_SKILLS:
+        if self.old_name in self.BANNED_SKILLS:
             self.set_bit('examinable', False)
 
 
@@ -819,6 +851,31 @@ class MasterSkillsObject(TableObject):
                                     if len(mso.levels) == target_num_skills])
         self.set_skills(new_skills, new_levels)
 
+    @classmethod
+    def full_preclean(cls):
+        backhand = [a for a in AbilityObject.every
+                    if a.old_name == 'Backhand'][0]
+        valid_backhand_masters = [
+            mso for mso in MasterSkillsObject.every if mso.name not in
+            MasterSkillsObject.RESTRICTED_NAMES + ['Hondara']]
+        existing = [mso for mso in valid_backhand_masters
+                    if backhand in mso.skills]
+        if not existing:
+            candidates = [mso for mso in valid_backhand_masters
+                          if len(mso.skills) < 6]
+            chosen = random.choice(candidates)
+            skills, levels = chosen.skills, chosen.levels
+            candidates = [l for l in range(min(levels), max(levels))
+                          if l not in levels]
+            if not candidates:
+                candidates = [max(levels)+1]
+            levels = sorted(levels + [random.choice(candidates)])
+            max_index = len(skills)
+            skills.insert(random.randint(0, max_index), backhand)
+            chosen.set_skills(skills, levels)
+
+        super().full_preclean()
+
     def preclean(self):
         if self.name in self.RESTRICTED_NAMES:
             return
@@ -989,7 +1046,8 @@ class BaseStatsObject(NameMixin):
         skill_type_counts = defaultdict(int)
         SKILL_TYPE_MAX_COUNT = 10
         for l in base_levels:
-            while True:
+            l.ability = 0
+            for _ in range(1000):
                 base_rank = AbilityObject.get(
                     l.old_data['ability']).levelup_alt
                 base_misc = AbilityObject.get(
@@ -1002,10 +1060,12 @@ class BaseStatsObject(NameMixin):
                     continue
 
                 assert base_rank.index != 0 and base_misc.index != 0
-                candidates = [c for c in AbilityObject.every
-                              if c.is_offense == base_misc.is_offense
-                              and c.is_utility == base_misc.is_utility
-                              and c is c.levelup_alt and c.rank >= 0]
+                candidates = [
+                    c for c in AbilityObject.every
+                    if c.is_offense == base_misc.is_offense
+                    and c.is_utility == base_misc.is_utility
+                    and c is c.levelup_alt and c.rank >= 0
+                    and c.old_name not in AbilityObject.LEVELUP_BANNED_SKILLS]
                 for e in shuffled_elements:
                     if base_misc.get_bit(e):
                         index = shuffled_elements.index(e)
@@ -1037,6 +1097,7 @@ class BaseStatsObject(NameMixin):
                     skill_type_counts[skill_type] += 1
                     break
 
+        base_levels = base_levels[:len(new_skills)]
         assert len(new_skills) == len(base_levels)
         base_level_levels = [l.level for l in base_levels]
         lower, upper = min(base_level_levels), max(base_level_levels)
@@ -1191,11 +1252,11 @@ class BaseStatsObject(NameMixin):
             for l in LevelObject.every:
                 if l.ability > 0:
                     skill = AbilityObject.get(l.ability)
-                    if skill.name == 'Pilfer' or skill.name == 'Steal':
+                    if skill.old_name in ['Pilfer', 'Steal']:
                         break
             else:
                 pilfer = [a for a in AbilityObject.every
-                          if a is a.examine_alt and a.name == 'Pilfer'][0]
+                          if a is a.examine_alt and a.old_name == 'Pilfer'][0]
                 pilfer.set_bit('examinable', True)
                 pilfer.reset_skill_type(AbilityObject.EXAMINE_SKILL)
                 self.skills_abilities.remove(0)
@@ -1329,10 +1390,7 @@ class ChrysmObject(TableObject):
         genes = [g for g in GeneObject.every if g.filename == self.filename]
         assert len(genes) == 1
         gene = genes[0]
-        try:
-            assert gene.old_data['gene_index'] == self.old_data['gene_index']
-        except:
-            import pdb; pdb.set_trace()
+        assert gene.old_data['gene_index'] == self.old_data['gene_index']
         return gene
 
     def cleanup(self):
@@ -1517,7 +1575,7 @@ class MonsterObject(DupeMixin, NameMixin):
             self.drop_item.name if self.drop_item else None, drop_rate)
         skills = []
         for a in sorted(self.abilities, key=lambda x: x.name):
-            if a.name in ['Nothing', 'Noting'] or not a.name:
+            if a.old_name in ['Nothing', 'Noting'] or not a.old_name:
                 continue
             skills.append('{0}{1}'.format(
                 a.name, '*' if a.get_bit('examinable') else ''))
@@ -1648,12 +1706,13 @@ class MonsterObject(DupeMixin, NameMixin):
         if not self.intershuffle_valid:
             return
 
-        ai_swap = self.get_similar()
+        ai_swap = self.get_similar(
+            random_degree=MonsterAbilityObject.random_degree)
         self.initial_skills = list(getattr(ai_swap, 'initial_skills'))
         for i in range(1, 5):
             for attr in ['condition', 'ai_unknown', 'skills']:
                 attr = '%s%s' % (attr, i)
-                setattr(self, attr, getattr(ai_swap, attr))
+                setattr(self, attr, ai_swap.old_data[attr])
 
         existing_skills = set([])
         for attr in ['initial_skills',
@@ -1673,7 +1732,7 @@ class MonsterObject(DupeMixin, NameMixin):
                           and existing.is_utility == s.is_utility
                           and s.rank >= 0]
             new_skill = existing.examine_alt.get_similar(
-                candidates, random_degree=self.random_degree)
+                candidates, random_degree=MonsterAbilityObject.random_degree)
             skill_map[existing.index] = new_skill.index
 
         for attr in ['initial_skills',
